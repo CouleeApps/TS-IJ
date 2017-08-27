@@ -1,0 +1,296 @@
+//Credit where credit is due:
+// Based on
+// CMDgram.y from Torque (a couple versions of it)
+// https://github.com/JetBrains/Grammar-Kit/blob/master/testData/generator/ExprParser.bnf
+// https://github.com/JetBrains/Grammar-Kit/blob/master/TUTORIAL.md
+{
+    parserClass="com.torquescript.parser.TSParser"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="TS"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.torquescript.psi"
+    psiImplPackage="com.torquescript.psi.impl"
+
+    elementTypeHolderClass="com.torquescript.psi.TSTypes"
+    elementTypeClass="com.torquescript.psi.TSElementType"
+    tokenTypeClass="com.torquescript.psi.TSTokenType"
+
+    tokens = [
+        rwFUNCTION='function'
+        rwPACKAGE='package'
+        rwIF='if'
+        rwELSE='else'
+        rwWHILE='while'
+        rwFOR='for'
+        rwSWITCH='switch'
+        rwSWITCHSTR='switch$'
+        rwCASE='case'
+        rwDEFAULT='default'
+        rwCASEOR='or'
+        rwBREAK='break'
+        rwCONTINUE='continue'
+        rwRETURN='return'
+        rwDATABLOCK='datablock'
+        rwNEW='new'
+
+        INTEGER='regexp:[0-9]+'
+        FLOAT='regexp:(([0-9]+)\.([0-9]+))|(([0-9]+)(\.([0-9]+))?[eE][+-]?([0-9]+))|(\.([0-9]+))|((\.([0-9]+))?[eE][+-]?([0-9]+))'
+        ID='regexp:[A-Za-z_][A-Za-z0-9_]*'
+        VAR='regexp:[$%][A-Za-z_]([:A-Za-z0-9_]*[A-Za-z0-9_])*'
+        SPACE='regexp:[ \t\v\f]'
+        HEXNUM='regexp:0[xX][a-fA-F0-9]+'
+        COMMENT='regexp://[^\n\r]*'
+        //https://stackoverflow.com/a/249937/214063
+        STRATOM='regexp:"(?:[^"\\]|\\.)*"'
+        TAGATOM="regexp:'(?:[^'\\]|\\.)*'"
+    ]
+
+    name(".*stmt")='statement'
+    extends(".*stmt")='stmt'
+    name(".*expr")='expression'
+    extends(".*expr")='expr'
+}
+
+tsFile ::= decl *
+
+decl ::=
+    stmt
+    |
+    fn_decl_stmt
+    |
+    package_decl
+
+package_decl ::=
+    rwPACKAGE ID '{' fn_decl_stmt* '}' ';'
+
+fn_decl_stmt ::=
+    rwFUNCTION ID '(' var_list? ')' '{' stmt* '}'
+    |
+    rwFUNCTION ID '::' ID '(' var_list? ')' '{' stmt* '}'
+
+var_list ::=
+    VAR (',' VAR)*
+
+stmt ::=
+    if_stmt
+    |
+    while_stmt
+    |
+    for_stmt
+    |
+    datablock_decl
+    |
+    switch_stmt
+    |
+    break_stmt
+    |
+    continue_stmt
+    |
+    return_stmt
+    |
+    expression_stmt
+
+//-----------------------------------------------------------------------------
+// Block-type expressions and stuff
+
+if_stmt ::=
+//Most specific rule comes first, so that means the else-case
+    rwIF '(' expr ')' stmt_block rwELSE stmt_block
+    |
+    rwIF '(' expr ')' stmt_block
+
+while_stmt ::=
+    rwWHILE '(' expr ')' stmt_block
+    //Do-while not in MBTS
+
+for_stmt ::=
+    rwFOR '(' expr ';' expr ';' expr ')' stmt_block
+    //Partial for not in MBTS
+
+datablock_decl ::=
+    rwDATABLOCK ID '(' ID (':' ID)? ')' '{' field_list '}' ';'
+
+switch_stmt ::=
+    rwSWITCH '(' expr ')' '{' case_stmt* default_stmt? '}'
+    |
+    rwSWITCHSTR '(' expr ')' '{' case_stmt* default_stmt? '}'
+
+case_stmt ::=
+    rwCASE case_expr ':' stmt*
+
+default_stmt ::=
+    rwDEFAULT ':' stmt*
+
+case_expr ::=
+    expr (rwCASEOR expr)*
+
+break_stmt ::= rwBREAK ';'
+continue_stmt ::= rwCONTINUE ';'
+return_stmt ::=
+    rwRETURN ';'
+    |
+    rwRETURN expr ';'
+
+//Block of statements eg after an if condition
+stmt_block ::=
+    '{' stmt* '}'
+    |
+    stmt
+
+field_list ::=
+    field_assign+
+
+field_assign ::=
+    ID '=' expr ';'
+    |
+    rwDATABLOCK '=' expr ';'
+    |
+    ID '[' array_index_expr ']' '=' expr ';'
+
+//Statement that is just an expression and a semi
+expression_stmt ::=
+    expr_stmt_group ';'
+
+private expr_stmt_group ::=
+dummy
+    | object_decl
+    | assign_var_expr
+    | assign_index_expr
+    | assign_ref_expr // ***
+    | assign_ref_index_expr // ***
+    | call_global_expr
+    | call_ns_global_expr
+    | call_ref_expr // ***
+//Allowing any *** will allow literal statements to be valid expressions
+
+//-----------------------------------------------------------------------------
+
+//Expressions
+expr ::=
+    object_group
+    |
+    bitwise_group
+    |
+    add_group
+    |
+    mul_group
+    |
+    unary_math_group
+    |
+    conditional_group
+    |
+    concat_group
+    |
+    unary_bool_group
+    |
+    pissy_group
+
+//-----------------------------------------------------------------------------
+// Groups
+
+//General expressions
+private object_group ::= object_expr
+private bitwise_group ::= xor_expr | mod_expr | bit_and_expr | bit_or_expr
+private add_group ::= plus_expr | minus_expr
+private mul_group ::= mul_expr | div_expr
+private unary_math_group ::= negate_expr | abs_expr
+private conditional_group ::= ternary_expr | conditional_expr
+private concat_group ::= concat_expr | concat_space_expr | concat_tab_expr | concat_nl_expr
+private unary_bool_group ::= not_expr | bit_not_expr
+
+//Object declaration is pretty straightforward
+private object_decl ::=
+    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' '{' field_assign* (object_decl ';')* '}'
+    |
+    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')'
+object_expr ::= object_decl
+
+class_name_expr ::=
+    ID
+    |
+    '(' expr ')'
+
+//-----------------------------------------------------------------------------
+// The relatively decent and normal expression section
+
+//Bitwise group
+xor_expr ::= expr '^' expr
+mod_expr ::= expr '%' expr
+bit_and_expr ::= expr '&' expr
+bit_or_expr ::= expr '|' expr
+//Add group
+plus_expr ::= expr '+' expr
+minus_expr ::= expr '-' expr
+//Mul group
+mul_expr ::= expr '*' expr
+div_expr ::= expr '/' expr
+//Unary math group
+negate_expr ::= '-' expr
+abs_expr ::= '+' expr
+//Conditional group
+ternary_expr ::= expr '?' expr ':' expr
+conditional_expr ::= expr ('>' | '<' | '>=' | '<=' | '==' | '!=' | '||' | '<<' | '>>' | '&&' | '$=' | '!$=') expr
+//Concat group
+concat_expr ::= expr '@' expr
+concat_space_expr ::= expr 'SPC' expr
+concat_tab_expr ::= expr 'TAB' expr
+concat_nl_expr ::= expr 'NL' expr
+//Unary bool group
+not_expr ::= '!' expr
+bit_not_expr ::= '~' expr
+
+//-----------------------------------------------------------------------------
+//Scary stuff beyond here, changing any of this will be a nightmare
+
+//Danger zone
+
+private pissy_group ::=
+    assign_var_expr
+    | assign_ref_expr
+    | assign_ref_index_expr
+    | assign_index_expr
+
+    | call_global_expr
+    | call_ns_global_expr
+    | call_ref_expr
+
+    | ref_index_expr
+    | ref_expr
+    | ref_var_index_expr
+
+    | literal_expr
+    | paren_expr
+
+
+//Assign group, can't shorten this with access_group because it has to be specific
+assign_var_expr ::= VAR assign_expr {rightAssociative=true}
+assign_index_expr ::= VAR '[' array_index_expr ']' assign_expr {rightAssociative=true}
+assign_ref_expr ::= expr '.' ID assign_expr {rightAssociative=true}
+assign_ref_index_expr ::= expr '.' ID '[' array_index_expr ']' assign_expr {rightAssociative=true}
+
+private assign_expr ::=
+    '=' expr
+    |
+    ('++' | '--')
+    |
+    ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '^=' | '|=' | '<<=' | '>>=') expr
+
+//Call group
+call_global_expr ::= ID '(' arg_list? ')'
+call_ns_global_expr ::= ID '::' ID '(' arg_list? ')'
+call_ref_expr ::= expr '.' ID '(' arg_list? ')'
+//Access group
+ref_var_index_expr ::= VAR '[' array_index_expr ']'
+ref_index_expr ::= expr '.' ID '[' array_index_expr ']'
+ref_expr ::= expr '.' ID
+//Primary group
+literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | VAR | ID
+paren_expr ::= '(' expr ')'
+
+//-----------------------------------------------------------------------------
+//Helpers
+
+private array_index_expr ::= expr (',' expr)*
+private arg_list ::= expr (',' expr)*
+dummy ::= 'dummy'
