@@ -29,6 +29,7 @@
         <lang.parserDefinition language="TS" implementationClass="com.torquescript.TSParserDefinition" />
         <lang.syntaxHighlighterFactory key="TS" implementationClass="com.torquescript.TSSyntaxHighlighterFactory" />
         <colorSettingsPage implementation="com.torquescript.TSColorSettingsPage" />
+        <completion.contributor language="TS" implementationClass="com.torquescript.TSCompletionContributor" />
     </extensions>
 
     <actions>
