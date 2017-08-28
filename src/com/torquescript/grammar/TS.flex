@@ -56,6 +56,8 @@ COMMENT  ="//"[^\r\n]*
     "return"                                        { return TSTypes.RETURN; }
     "datablock"                                     { return TSTypes.DATABLOCK; }
     "new"                                           { return TSTypes.NEW; }
+    "true"                                          { return TSTypes.TRUE; }
+    "false"                                         { return TSTypes.FALSE; }
 
     "(" { return TSTypes.PAREN_OPEN; }
     ")" { return TSTypes.PAREN_CLOSE; }

@@ -18,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class TSParserDefinition implements ParserDefinition {
     public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
     public static final TokenSet COMMENTS = TokenSet.create(TSTypes.COMMENT);
+    public static final TokenSet STRINGS = TokenSet.create(TSTypes.STRATOM, TSTypes.TAGATOM);
 
     public static final IFileElementType FILE = new IFileElementType(TSLanguage.INSTANCE);
 
@@ -52,7 +53,7 @@ public class TSParserDefinition implements ParserDefinition {
     @NotNull
     @Override
     public TokenSet getStringLiteralElements() {
-        return TokenSet.EMPTY;
+        return STRINGS;
     }
 
     @NotNull

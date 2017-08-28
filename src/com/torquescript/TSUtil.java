@@ -46,9 +46,13 @@ public class TSUtil {
         for (VirtualFile virtualFile : virtualFiles) {
             TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (tsFile != null) {
-                TSFnDeclStmt[] functions = PsiTreeUtil.getChildrenOfType(tsFile, TSFnDeclStmt.class);
-                if (functions != null) {
-                    Collections.addAll(result, functions);
+                try {
+                    TSFnDeclStmt[] functions = PsiTreeUtil.getChildrenOfType(tsFile, TSFnDeclStmt.class);
+                    if (functions != null) {
+                        Collections.addAll(result, functions);
+                    }
+                } catch (Exception ignored) {
+
                 }
             }
         }

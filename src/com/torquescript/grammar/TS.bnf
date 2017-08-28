@@ -18,15 +18,13 @@
 
     psiImplUtilClass="com.torquescript.psi.impl.TSPsiImplUtil"
 
-    name(".*stmt")='statement'
-    extends(".*stmt")='stmt'
     name(".*expr")='expression'
     extends(".*expr")='expr'
 }
 
 tsFile ::= decl *
 
-decl ::=
+private decl ::=
     stmt
     |
     fn_decl_stmt
@@ -40,10 +38,11 @@ fn_decl_stmt ::=
     FUNCTION ID PAREN_OPEN var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
     |
     FUNCTION ID COLON_DOUBLE ID PAREN_OPEN var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
-    {methods=[getFunctionName]}
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement"
+     methods=[getFunctionName getName setName getNameIdentifier]}
 
 var_list ::=
-    var_group (COMMA var_group)*
+    var_expr (COMMA var_expr)*
 
 stmt ::=
     if_stmt
@@ -238,8 +237,8 @@ private pissy_group ::=
 
 
 //Assign group, can't shorten this with access_group because it has to be specific
-assign_var_expr ::= var_group assign_expr {rightAssociative=true}
-assign_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_expr {rightAssociative=true}
+assign_var_expr ::= var_expr assign_expr {rightAssociative=true}
+assign_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_expr {rightAssociative=true}
 assign_ref_expr ::= expr DOT ID assign_expr {rightAssociative=true}
 assign_ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_expr {rightAssociative=true}
 
@@ -256,11 +255,11 @@ call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 //Access group
-ref_var_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE
+ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_expr ::= expr DOT ID
 //Primary group
-literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_group | ID
+literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_expr | bool_expr | ID
 paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 
 //-----------------------------------------------------------------------------
@@ -268,4 +267,5 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 
 private array_index_expr ::= expr (COMMA expr)*
 private arg_list ::= expr (COMMA expr)*
-private var_group ::= GLOBALVAR | LOCALVAR
+bool_expr ::= TRUE | FALSE
+var_expr ::= GLOBALVAR | LOCALVAR {methods=[getName isLocal]}
