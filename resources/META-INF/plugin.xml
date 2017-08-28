@@ -24,6 +24,13 @@
     <depends>com.intellij.modules.lang</depends>
     -->
 
+    <project-components>
+        <component>
+            <interface-class>com.intellij.openapi.components.ProjectComponent</interface-class>
+            <implementation-class>com.torquescript.TSPluginComponent</implementation-class>
+        </component>
+    </project-components>
+
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="com.torquescript.TSFileTypeFactory" />
         <lang.parserDefinition language="TS" implementationClass="com.torquescript.TSParserDefinition" />
