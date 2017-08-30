@@ -7,8 +7,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.torquescript.psi.TSFnNameStmt;
-import com.torquescript.psi.TSTypes;
+import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import static com.torquescript.highlighting.TSSyntaxHighlighter.*;
@@ -23,12 +22,36 @@ public class TSHighlightingAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        if (element.getNode().getElementType().equals(TSTypes.FN_NAME_STMT)) {
+        if (element instanceof  TSFnNameStmt) {
             TSFnNameStmt fn = (TSFnNameStmt) element;
 
             if (fn.isGlobal()) {
                 PsiElement name = fn.getFirstChild();
                 setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION);
+            } else {
+                PsiElement namespace = fn.getFirstChild();
+                PsiElement name = namespace.getNextSibling().getNextSibling();
+
+                setHighlighting(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION);
+            }
+        }
+
+        if (element instanceof TSCallExpr) {
+            if (element instanceof TSCallGlobalExpr) {
+                PsiElement name = element.getFirstChild();
+                setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
+            } else if (element instanceof TSCallNsGlobalExpr) {
+                PsiElement namespace = element.getFirstChild();
+                PsiElement name = namespace.getNextSibling().getNextSibling();
+
+                setHighlighting(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
+            } else if (element instanceof  TSCallRefExpr) {
+                PsiElement target = element.getFirstChild();
+                PsiElement name = target.getNextSibling().getNextSibling();
+
+                setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
             }
         }
     }

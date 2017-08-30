@@ -131,7 +131,7 @@ expression_stmt ::=
     expr_stmt_group SEMICOLON
 
 private expr_stmt_group ::=
-      object_decl
+      object_expr
     | assign_var_expr
     | assign_index_expr
     | assign_ref_expr // ***
@@ -177,11 +177,11 @@ private concat_group ::= concat_expr | concat_space_expr | concat_tab_expr | con
 private unary_bool_group ::= not_expr | bit_not_expr
 
 //Object declaration is pretty straightforward
-private object_decl ::=
-    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_decl SEMICOLON)* BRACE_CLOSE
+object_expr ::=
+    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
     |
     NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE
-object_expr ::= object_decl
+    {methods=[getName getClassName getParentName]}
 
 class_name_expr ::=
     ID
@@ -255,9 +255,10 @@ private assign_block ::=
     (ASSIGN_ADD | ASSIGN_SUB | ASSIGN_MUL | ASSIGN_DIV | ASSIGN_MOD | ASSIGN_AND | ASSIGN_XOR | ASSIGN_OR | ASSIGN_LSHIFT | ASSIGN_RSHIFT) expr
 
 //Call group
-call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE
-call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE
-call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE
+fake call_expr ::=
+call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 //Access group
 ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE

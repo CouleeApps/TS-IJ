@@ -33,20 +33,18 @@ public class TSMethodCallCompletionContributor extends CompletionProvider<Comple
         for (VirtualFile virtualFile : virtualFiles) {
             TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (tsFile != null) {
-                TSFnDeclStmt[] functions = PsiTreeUtil.getChildrenOfType(tsFile, TSFnDeclStmt.class);
-                if (functions != null) {
-                    for (TSFnDeclStmt function : functions) {
-                        if (function.isGlobal())
-                            continue;
+                Collection<TSFnDeclStmt> functions = PsiTreeUtil.findChildrenOfType(tsFile, TSFnDeclStmt.class);
+                for (TSFnDeclStmt function : functions) {
+                    if (function.isGlobal())
+                        continue;
 
-                        result.addElement(
-                                LookupElementBuilder.create(function.getFunctionName())
-                                        .withCaseSensitivity(false)
-                                        .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
-                                        .withBoldness(ns != null && function.getNamespace().equals(ns))
-                                        .withTailText(function.getArgList())
-                        );
-                    }
+                    result.addElement(
+                            LookupElementBuilder.create(function.getFunctionName())
+                                    .withCaseSensitivity(false)
+                                    .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
+                                    .withBoldness(ns != null && function.getNamespace().equals(ns))
+                                    .withTailText(function.getArgList())
+                    );
                 }
             }
         }

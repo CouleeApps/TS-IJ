@@ -15,12 +15,13 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.torquescript.TSFile;
 import com.torquescript.TSFileType;
 import com.torquescript.psi.TSFnDeclStmt;
-import com.torquescript.psi.TSTypes;
+import com.torquescript.psi.TSObjectExpr;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Collections;
 
-public class TSGlobalCallCompletionContributor extends CompletionProvider<CompletionParameters> {
+public class TSObjectNameCompletionContributor extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
         //All global functions
@@ -30,16 +31,15 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
         for (VirtualFile virtualFile : virtualFiles) {
             TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (tsFile != null) {
-                Collection<TSFnDeclStmt> functions = PsiTreeUtil.findChildrenOfType(tsFile, TSFnDeclStmt.class);
-                for (TSFnDeclStmt function : functions) {
-                    if (!function.isGlobal())
-                        continue;
-
-                    result.addElement(
-                            LookupElementBuilder.create(function.getFunctionName())
-                                    .withCaseSensitivity(false)
-                                    .withTailText(function.getArgList())
-                    );
+                Collection<TSObjectExpr> objects = PsiTreeUtil.findChildrenOfType(tsFile, TSObjectExpr.class);
+                for (TSObjectExpr object : objects) {
+                    String name = object.getName();
+                    if (name != null) {
+                        result.addElement(
+                                LookupElementBuilder.create(name)
+                                .withCaseSensitivity(false)
+                        );
+                    }
                 }
             }
         }

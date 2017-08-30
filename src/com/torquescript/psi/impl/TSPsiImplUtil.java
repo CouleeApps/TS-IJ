@@ -2,6 +2,7 @@ package com.torquescript.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.psi.*;
 
 public class TSPsiImplUtil {
@@ -34,38 +35,27 @@ public class TSPsiImplUtil {
     }
 
     public static String getFunctionName(TSFnDeclStmt element) {
-        ASTNode nameNode;
-        //Find which node contains our function name
-        if (isGlobal(element)) {
-            nameNode = element.getNode().findChildByType(TSTypes.ID);
-        } else {
-            ASTNode anchor = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
-            nameNode = element.getNode().findChildByType(TSTypes.ID, anchor);
-        }
-        if (nameNode == null) {
+        TSFnNameStmt name = PsiTreeUtil.getChildOfType(element, TSFnNameStmt.class);
+        if (name == null) {
             return null;
         }
-        return nameNode.getText();
+        return name.getFunctionName();
     }
 
     public static String getNamespace(TSFnDeclStmt element) {
-        if (isGlobal(element)) {
+        TSFnNameStmt name = PsiTreeUtil.getChildOfType(element, TSFnNameStmt.class);
+        if (name == null) {
             return null;
         }
-
-        //Namespace should be the first
-        ASTNode nsNode = element.getNode().findChildByType(TSTypes.ID);
-        if (nsNode == null) {
-            return null;
-        }
-
-        return nsNode.getText();
+        return name.getNamespace();
     }
 
     public static boolean isGlobal(TSFnDeclStmt element) {
-        //If we have a double colon that counts as a namespace
-        ASTNode doubleColon = element.getNode().findChildByType(TSTypes.FN_NAME_STMT);
-        return doubleColon == null;
+        TSFnNameStmt name = PsiTreeUtil.getChildOfType(element, TSFnNameStmt.class);
+        if (name == null) {
+            return false;
+        }
+        return name.isGlobal();
     }
 
     public static String getArgList(TSFnDeclStmt element) {
@@ -110,7 +100,7 @@ public class TSPsiImplUtil {
 
     public static boolean isGlobal(TSFnNameStmt element) {
         //If we have a double colon that counts as a namespace
-        ASTNode doubleColon = element.getNode().findChildByType(TSTypes.FN_NAME_STMT);
+        ASTNode doubleColon = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
         return doubleColon == null;
     }
 
@@ -136,5 +126,33 @@ public class TSPsiImplUtil {
             return false;
         }
         return (node.getElementType().equals(TSTypes.LOCALVAR));
+    }
+
+    public static String getName(TSObjectExpr obj) {
+        //Should be the first element after the open paren
+        ASTNode node = obj.getNode();
+        if (node == null) {
+            return null;
+        }
+        ASTNode openParen = node.findChildByType(TSTypes.PAREN_OPEN);
+        if (openParen == null) {
+            return null;
+        }
+        PsiElement nameNode = openParen.getPsi().getNextSibling();
+        if (nameNode == null) {
+            return null;
+        }
+        if (!(nameNode instanceof TSLiteralExpr)) {
+            return null;
+        }
+        return nameNode.getFirstChild().getText();
+    }
+
+    public static String getClassName(TSObjectExpr obj) {
+        return null;
+    }
+
+    public static String getParentName(TSObjectExpr obj) {
+        return null;
     }
 }

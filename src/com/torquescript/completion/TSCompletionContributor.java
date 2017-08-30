@@ -20,6 +20,7 @@ import com.torquescript.TSLanguage;
 import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
 
+import javax.xml.bind.Element;
 import java.util.Collection;
 
 import static com.intellij.patterns.PlatformPatterns.*;
@@ -32,6 +33,7 @@ public class TSCompletionContributor extends CompletionContributor {
         extend(CompletionType.BASIC, inMethodCall(), new TSMethodCallCompletionContributor());
         extend(CompletionType.BASIC, inLocalVariable(), new TSLocalVariableCompletionContributor());
         extend(CompletionType.BASIC, inGlobalVariable(), new TSGlobalVariableCompletionContributor());
+        extend(CompletionType.BASIC, inObjectName(), new TSObjectNameCompletionContributor());
     }
 
     @Override
@@ -47,13 +49,13 @@ public class TSCompletionContributor extends CompletionContributor {
     }
 
     private static ElementPattern<? extends PsiElement> isKeywordable() {
-        return inGlobalCall();
-    }
-
-    private static ElementPattern<? extends PsiElement> inGlobalCall() {
         return psiElement(TSTypes.ID).withLanguage(TSLanguage.INSTANCE)
                 .andNot(psiElement().afterSibling(psiElement(TSTypes.DOT)))
                 .andNot(psiElement().afterSibling(psiElement(TSTypes.COLON_DOUBLE)));
+    }
+
+    private static ElementPattern<? extends PsiElement> inGlobalCall() {
+        return isKeywordable();
     }
 
     private static ElementPattern<? extends PsiElement> inGlobalNSCall() {
@@ -78,6 +80,9 @@ public class TSCompletionContributor extends CompletionContributor {
                         .andNot(psiElement().afterSibling(psiElement(TSTypes.DOT)))
                         .andNot(psiElement().afterSibling(psiElement(TSTypes.COLON_DOUBLE))),
                 psiElement(TSTypes.GLOBALVAR));
+    }
 
+    private static ElementPattern<? extends PsiElement> inObjectName() {
+        return isKeywordable();
     }
 }
