@@ -22,7 +22,7 @@ import java.util.Collection;
 public class TSGlobalNSCallCompletionContributor extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-        String namespace = parameters.getOriginalPosition().getPrevSibling().getPrevSibling().getText();
+        String namespace = parameters.getPosition().getPrevSibling().getPrevSibling().getText();
 
         Project project = parameters.getOriginalFile().getProject();
         Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, TSFileType.INSTANCE, GlobalSearchScope.allScope(project));

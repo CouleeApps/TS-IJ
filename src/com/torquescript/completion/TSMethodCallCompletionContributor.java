@@ -24,7 +24,7 @@ import java.util.Collection;
 public class TSMethodCallCompletionContributor extends CompletionProvider<CompletionParameters> {
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-        PsiElement caller = parameters.getOriginalPosition().getPrevSibling().getPrevSibling();
+        PsiElement caller = parameters.getPosition().getPrevSibling().getPrevSibling();
         String ns = TSUtil.getElementNamespace(caller);
 
         //All global functions
