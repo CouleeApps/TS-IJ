@@ -34,13 +34,84 @@ public class TSPsiImplUtil {
     }
 
     public static String getFunctionName(TSFnDeclStmt element) {
-        ASTNode nameNode = element.getNode().findChildByType(TSTypes.ID);
+        ASTNode nameNode;
+        //Find which node contains our function name
+        if (isGlobal(element)) {
+            nameNode = element.getNode().findChildByType(TSTypes.ID);
+        } else {
+            ASTNode anchor = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
+            nameNode = element.getNode().findChildByType(TSTypes.ID, anchor);
+        }
+        if (nameNode == null) {
+            return null;
+        }
+        return nameNode.getText();
+    }
 
-        if (nameNode != null) {
-            return nameNode.getText();
+    public static String getNamespace(TSFnDeclStmt element) {
+        if (isGlobal(element)) {
+            return null;
+        }
+
+        //Namespace should be the first
+        ASTNode nsNode = element.getNode().findChildByType(TSTypes.ID);
+        if (nsNode == null) {
+            return null;
+        }
+
+        return nsNode.getText();
+    }
+
+    public static boolean isGlobal(TSFnDeclStmt element) {
+        //If we have a double colon that counts as a namespace
+        ASTNode doubleColon = element.getNode().findChildByType(TSTypes.FN_NAME_STMT);
+        return doubleColon == null;
+    }
+
+    public static String getArgList(TSFnDeclStmt element) {
+        ASTNode argNode = element.getNode().findChildByType(TSTypes.VAR_LIST);
+
+        if (argNode != null) {
+            return "(" + argNode.getText() + ")";
         }
 
         return null;
+    }
+
+
+    public static String getFunctionName(TSFnNameStmt element) {
+        ASTNode nameNode;
+        //Find which node contains our function name
+        if (isGlobal(element)) {
+            nameNode = element.getNode().findChildByType(TSTypes.ID);
+        } else {
+            ASTNode anchor = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
+            nameNode = element.getNode().findChildByType(TSTypes.ID, anchor);
+        }
+        if (nameNode == null) {
+            return null;
+        }
+        return nameNode.getText();
+    }
+
+    public static String getNamespace(TSFnNameStmt element) {
+        if (isGlobal(element)) {
+            return null;
+        }
+
+        //Namespace should be the first
+        ASTNode nsNode = element.getNode().findChildByType(TSTypes.ID);
+        if (nsNode == null) {
+            return null;
+        }
+
+        return nsNode.getText();
+    }
+
+    public static boolean isGlobal(TSFnNameStmt element) {
+        //If we have a double colon that counts as a namespace
+        ASTNode doubleColon = element.getNode().findChildByType(TSTypes.FN_NAME_STMT);
+        return doubleColon == null;
     }
 
     public static String getName(TSVarExpr variable) {
@@ -52,7 +123,7 @@ public class TSPsiImplUtil {
         if (node == null) {
             return null;
         }
-        return node.getText();
+        return node.getText().substring(1);
     }
 
     public static boolean isLocal(TSVarExpr variable) {

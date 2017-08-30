@@ -1,4 +1,4 @@
-package com.torquescript;
+package com.torquescript.highlighting;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.torquescript.TSLexerAdapter;
 import com.torquescript.psi.TSTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -119,7 +120,6 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
         KEYS.put(TSTypes.SEMICOLON, new TextAttributesKey[]{SEMICOLON});
         KEYS.put(TSTypes.COMMA, new TextAttributesKey[]{COMMA});
         KEYS.put(TSTypes.DOT, new TextAttributesKey[]{DOT});
-        KEYS.put(TSTypes.FN_DECL_STMT, new TextAttributesKey[]{FUNCTION});
         KEYS.put(TSTypes.CALL_REF_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
         KEYS.put(TSTypes.CALL_GLOBAL_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
         KEYS.put(TSTypes.CALL_NS_GLOBAL_EXPR, new TextAttributesKey[]{FUNCTION_CALL});

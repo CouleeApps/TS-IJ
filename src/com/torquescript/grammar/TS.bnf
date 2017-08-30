@@ -35,11 +35,15 @@ package_decl ::=
     PACKAGE ID BRACE_OPEN fn_decl_stmt* BRACE_CLOSE SEMICOLON
 
 fn_decl_stmt ::=
-    FUNCTION ID PAREN_OPEN var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
-    |
-    FUNCTION ID COLON_DOUBLE ID PAREN_OPEN var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
+    FUNCTION fn_name_stmt var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement"
-     methods=[getFunctionName getName setName getNameIdentifier]}
+     methods=[getFunctionName getName setName getNameIdentifier getNamespace isGlobal getArgList]}
+
+fn_name_stmt ::=
+    ID PAREN_OPEN
+    |
+    ID COLON_DOUBLE ID PAREN_OPEN
+    {methods=[getFunctionName getNamespace isGlobal]}
 
 var_list ::=
     var_expr (COMMA var_expr)*
@@ -237,12 +241,13 @@ private pissy_group ::=
 
 
 //Assign group, can't shorten this with access_group because it has to be specific
-assign_var_expr ::= var_expr assign_expr {rightAssociative=true}
-assign_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_expr {rightAssociative=true}
-assign_ref_expr ::= expr DOT ID assign_expr {rightAssociative=true}
-assign_ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_expr {rightAssociative=true}
+fake assign_expr ::=
+assign_var_expr ::= var_expr assign_block {rightAssociative=true extends=assign_expr}
+assign_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
+assign_ref_expr ::= expr DOT ID assign_block {rightAssociative=true extends=assign_expr}
+assign_ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
 
-private assign_expr ::=
+private assign_block ::=
     ASSIGN expr
     |
     (ASSIGN_INC | ASSIGN_DEC)
@@ -250,10 +255,9 @@ private assign_expr ::=
     (ASSIGN_ADD | ASSIGN_SUB | ASSIGN_MUL | ASSIGN_DIV | ASSIGN_MOD | ASSIGN_AND | ASSIGN_XOR | ASSIGN_OR | ASSIGN_LSHIFT | ASSIGN_RSHIFT) expr
 
 //Call group
-fake call_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {methods=[getFunctionName]}
-call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE
+call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE
+call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE
 //Access group
 ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE

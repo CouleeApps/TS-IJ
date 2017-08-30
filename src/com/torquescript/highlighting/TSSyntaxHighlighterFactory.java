@@ -1,4 +1,4 @@
-package com.torquescript;
+package com.torquescript.highlighting;
 
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;
