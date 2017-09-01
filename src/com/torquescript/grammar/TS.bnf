@@ -36,8 +36,8 @@ package_decl ::=
 
 fn_decl_stmt ::=
     FUNCTION fn_name_stmt var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
-    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement"
-     methods=[getFunctionName getName setName getNameIdentifier getNamespace isGlobal getArgList]}
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
+     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace isGlobal getArgList]}
 
 fn_name_stmt ::=
     ID PAREN_OPEN

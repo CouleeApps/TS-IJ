@@ -2,6 +2,7 @@ package com.torquescript.psi.impl;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.NavigationItem;
 import com.torquescript.psi.TSNamedElement;
 import org.jetbrains.annotations.NotNull;
 

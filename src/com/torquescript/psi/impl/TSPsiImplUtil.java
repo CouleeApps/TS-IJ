@@ -1,9 +1,14 @@
 package com.torquescript.psi.impl;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.torquescript.TSIcons;
 import com.torquescript.psi.*;
+import org.jetbrains.annotations.Nullable;
+
+import javax.swing.*;
 
 public class TSPsiImplUtil {
     public static String getName(TSFnDeclStmt element) {
@@ -82,6 +87,32 @@ public class TSPsiImplUtil {
             return null;
         }
         return nameNode.getText();
+    }
+
+    public static ItemPresentation getPresentation(final TSFnDeclStmt function) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                if (function.isGlobal()) {
+                    return function.getFunctionName();
+                } else {
+                    return function.getNamespace() + "::" + function.getFunctionName();
+                }
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return function.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean unused) {
+                return TSIcons.FILE;
+            }
+        };
     }
 
     public static String getNamespace(TSFnNameStmt element) {

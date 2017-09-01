@@ -36,7 +36,7 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
                         continue;
 
                     result.addElement(
-                            LookupElementBuilder.create(function.getFunctionName())
+                            LookupElementBuilder.create(function)
                                     .withCaseSensitivity(false)
                                     .withTailText(function.getArgList())
                     );

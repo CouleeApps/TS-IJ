@@ -38,6 +38,8 @@
         <colorSettingsPage implementation="com.torquescript.TSColorSettingsPage" />
         <completion.contributor language="TS" implementationClass="com.torquescript.completion.TSCompletionContributor" />
         <annotator implementationClass="com.torquescript.highlighting.TSHighlightingAnnotator" language="TS" />
+        <psi.referenceContributor language="TS" implementation="com.torquescript.TSReferenceContributor" />
+        <gotoSymbolContributor implementation="com.torquescript.TSChooseByNameContributor" />
     </extensions>
 
     <actions>
