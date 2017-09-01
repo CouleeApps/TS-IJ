@@ -137,8 +137,8 @@ private expr_stmt_group ::=
     | assign_ref_expr // ***
     | assign_ref_index_expr // ***
     | call_global_expr
-    | call_ns_global_expr
-    | call_ref_expr // ***
+    | call_global_ns_expr
+    | call_method_expr // ***
 //Allowing any *** will allow literal statements to be valid expressions
 
 //-----------------------------------------------------------------------------
@@ -229,8 +229,8 @@ private pissy_group ::=
     | assign_index_expr
 
     | call_global_expr
-    | call_ns_global_expr
-    | call_ref_expr
+    | call_global_ns_expr
+    | call_method_expr
 
     | ref_index_expr
     | ref_expr
@@ -255,10 +255,10 @@ private assign_block ::=
     (ASSIGN_ADD | ASSIGN_SUB | ASSIGN_MUL | ASSIGN_DIV | ASSIGN_MOD | ASSIGN_AND | ASSIGN_XOR | ASSIGN_OR | ASSIGN_LSHIFT | ASSIGN_RSHIFT) expr
 
 //Call group
-fake call_expr ::=
+fake call_expr ::= {methods=[getReference getFunctionName getNameNode]}
 call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_ns_global_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_ref_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_global_ns_expr ::= ID COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_method_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 //Access group
 ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE

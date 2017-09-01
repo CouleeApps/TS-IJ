@@ -14,7 +14,6 @@ public class TSReferenceContributor extends PsiReferenceContributor {
                     @NotNull
                     @Override
                     public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
-
                         return PsiReference.EMPTY_ARRAY;
                     }
                 });

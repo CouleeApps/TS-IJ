@@ -41,13 +41,13 @@ public class TSHighlightingAnnotator implements Annotator {
             if (element instanceof TSCallGlobalExpr) {
                 PsiElement name = element.getFirstChild();
                 setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
-            } else if (element instanceof TSCallNsGlobalExpr) {
+            } else if (element instanceof TSCallGlobalNsExpr) {
                 PsiElement namespace = element.getFirstChild();
                 PsiElement name = namespace.getNextSibling().getNextSibling();
 
                 setHighlighting(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
                 setHighlighting(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
-            } else if (element instanceof  TSCallRefExpr) {
+            } else if (element instanceof TSCallMethodExpr) {
                 PsiElement target = element.getFirstChild();
                 PsiElement name = target.getNextSibling().getNextSibling();
 

@@ -120,9 +120,9 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
         KEYS.put(TSTypes.SEMICOLON, new TextAttributesKey[]{SEMICOLON});
         KEYS.put(TSTypes.COMMA, new TextAttributesKey[]{COMMA});
         KEYS.put(TSTypes.DOT, new TextAttributesKey[]{DOT});
-        KEYS.put(TSTypes.CALL_REF_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
+        KEYS.put(TSTypes.CALL_METHOD_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
         KEYS.put(TSTypes.CALL_GLOBAL_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
-        KEYS.put(TSTypes.CALL_NS_GLOBAL_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
+        KEYS.put(TSTypes.CALL_GLOBAL_NS_EXPR, new TextAttributesKey[]{FUNCTION_CALL});
     }
 
     @NotNull
