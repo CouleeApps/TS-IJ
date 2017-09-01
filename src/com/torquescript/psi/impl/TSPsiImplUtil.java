@@ -73,9 +73,9 @@ public class TSPsiImplUtil {
 
         if (argNode != null) {
             return "(" + argNode.getText() + ")";
+        } else {
+            return "()";
         }
-
-        return null;
     }
 
 

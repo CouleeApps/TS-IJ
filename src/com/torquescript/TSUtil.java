@@ -7,20 +7,26 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.intellij.util.Time;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.torquescript.psi.*;
 
 import java.util.*;
 
 public class TSUtil {
-    private static List<TSFnDeclStmt> FUNCTIONS = null;
+    private static Set<TSFnDeclStmt> FUNCTIONS = null;
     private static long LAST_UPDATE;
+    private static final long CACHE_LIFETIME = 15 * /* ns */ 1000000;
     private static final String LOCK = "Probably slow";
 
-    public static List<TSFnDeclStmt> findFunctions(Project project, String key) {
+    /**
+     * Find a function in the project matching a given string.
+     * @param project Containing project in which to search
+     * @param key Search string compare functions with
+     * @return A function declaration, or null if none is found
+     */
+    public static List<TSFnDeclStmt> findFunction(Project project, String key) {
         List<TSFnDeclStmt> result = null;
-        List<TSFnDeclStmt> functions = new ArrayList<>(findFunctions(project));
+        Collection<TSFnDeclStmt> functions = new ArrayList<>(getFunctionList(project));
         for (TSFnDeclStmt function : functions) {
             if (key.equalsIgnoreCase(function.getFunctionName())) {
                 if (result == null) {
@@ -32,22 +38,32 @@ public class TSUtil {
         return result == null ? Collections.emptyList() : result;
     }
 
-    public static List<TSFnDeclStmt> findFunctions(Project project) {
+    /**
+     * Get a list of all function declarations in the project. This list is cached and updated every few seconds
+     * so you don't have to find all the functions for every function call.
+     * @param project Containing project in which to search
+     * @return A list of all function declarations
+     */
+    public static Collection<TSFnDeclStmt> getFunctionList(Project project) {
+        //Need to synchronize this in case we update cache while something is accessing the functions
         synchronized (LOCK) {
+            //If the cache has existed for long enough we should probably regenerate it
             if (FUNCTIONS != null) {
-                if (System.nanoTime() - LAST_UPDATE > /*1 sec*/ 1000000 * 15) {
+                if (System.nanoTime() - LAST_UPDATE > CACHE_LIFETIME) {
                     FUNCTIONS = null;
                 }
             }
+            //Cache is still warm, use it instead of searching
             if (FUNCTIONS != null) {
                 return FUNCTIONS;
             }
 
+            //Need to regenerate cache
             LAST_UPDATE = System.nanoTime();
+            FUNCTIONS = new HashSet<>();
 
-            FUNCTIONS = new ArrayList<>();
+            //Search every file in the project
             Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, TSFileType.INSTANCE, GlobalSearchScope.allScope(project));
-
             for (VirtualFile virtualFile : virtualFiles) {
                 TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
                 if (tsFile != null) {
@@ -73,6 +89,7 @@ public class TSUtil {
                     }
                 }
             }
+
             return FUNCTIONS;
         }
     }

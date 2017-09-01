@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TSReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
@@ -24,7 +25,7 @@ public class TSReference extends PsiReferenceBase<PsiElement> implements PsiPoly
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<TSFnDeclStmt> functions = TSUtil.findFunctions(project, name);
+        final List<TSFnDeclStmt> functions = TSUtil.findFunction(project, name);
         List<ResolveResult> results = new ArrayList<>();
         for (TSFnDeclStmt function : functions) {
             results.add(new PsiElementResolveResult(function));
@@ -43,7 +44,7 @@ public class TSReference extends PsiReferenceBase<PsiElement> implements PsiPoly
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        List<TSFnDeclStmt> functions = TSUtil.findFunctions(project);
+        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         List<LookupElement> variants = new ArrayList<>();
 
         for (final TSFnDeclStmt function : functions) {

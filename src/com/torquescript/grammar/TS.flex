@@ -58,6 +58,7 @@ COMMENT  ="//"[^\r\n]*
     "new"                                           { return TSTypes.NEW; }
     "true"                                          { return TSTypes.TRUE; }
     "false"                                         { return TSTypes.FALSE; }
+    "Parent"                                        { return TSTypes.PARENT; }
 
     "(" { return TSTypes.PAREN_OPEN; }
     ")" { return TSTypes.PAREN_CLOSE; }

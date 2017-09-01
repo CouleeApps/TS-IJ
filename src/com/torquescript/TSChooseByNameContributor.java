@@ -7,13 +7,14 @@ import com.torquescript.psi.TSFnDeclStmt;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class TSChooseByNameContributor implements ChooseByNameContributor {
     @NotNull
     @Override
     public String[] getNames(Project project, boolean includeNonProjectItems) {
-        List<TSFnDeclStmt> functions = TSUtil.findFunctions(project);
+        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         List<String> names = new ArrayList<>(functions.size());
         for (TSFnDeclStmt function : functions) {
             if (function.getFunctionName() != null && function.getFunctionName().length() != 0) {
@@ -26,7 +27,7 @@ public class TSChooseByNameContributor implements ChooseByNameContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        List<TSFnDeclStmt> functions = TSUtil.findFunctions(project, name);
+        List<TSFnDeclStmt> functions = TSUtil.findFunction(project, name);
         return functions.toArray(new NavigationItem[functions.size()]);
     }
 }

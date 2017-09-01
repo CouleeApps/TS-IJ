@@ -67,6 +67,7 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
         KEYS.put(TSTypes.NEW, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.TRUE, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.FALSE, new TextAttributesKey[]{KEYWORD});
+        KEYS.put(TSTypes.PARENT, new TextAttributesKey[]{KEYWORD});
 
         KEYS.put(TSTypes.PAREN_OPEN, new TextAttributesKey[]{PARENTHESES});
         KEYS.put(TSTypes.PAREN_CLOSE, new TextAttributesKey[]{PARENTHESES});
