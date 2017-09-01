@@ -51,6 +51,7 @@ public class TSReference extends PsiReferenceBase<PsiElement> implements PsiPoly
                 variants.add(LookupElementBuilder.create(function)
                         .withIcon(TSIcons.FILE)
                         .withTypeText(function.getContainingFile().getName())
+                        .withCaseSensitivity(false)
 
                 );
             }

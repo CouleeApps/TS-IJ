@@ -42,7 +42,7 @@ public class TSMethodCallCompletionContributor extends CompletionProvider<Comple
                             LookupElementBuilder.create(function.getFunctionName())
                                     .withCaseSensitivity(false)
                                     .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
-                                    .withBoldness(ns != null && function.getNamespace().equals(ns))
+                                    .withBoldness(ns != null && function.getNamespace().equalsIgnoreCase(ns))
                                     .withTailText(function.getArgList())
                     );
                 }

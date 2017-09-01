@@ -37,7 +37,7 @@
         <lang.syntaxHighlighterFactory key="TS" implementationClass="com.torquescript.highlighting.TSSyntaxHighlighterFactory" />
         <colorSettingsPage implementation="com.torquescript.TSColorSettingsPage" />
         <completion.contributor language="TS" implementationClass="com.torquescript.completion.TSCompletionContributor" />
-        <annotator implementationClass="com.torquescript.highlighting.TSHighlightingAnnotator" language="TS" />
+        <annotator implementationClass="com.torquescript.annotator.TSMethodCallAnnotator" language="TS" />
         <psi.referenceContributor language="TS" implementation="com.torquescript.TSReferenceContributor" />
         <gotoSymbolContributor implementation="com.torquescript.TSChooseByNameContributor" />
         <lang.braceMatcher language="TS" implementationClass="com.torquescript.TSBraceMatcher"/>

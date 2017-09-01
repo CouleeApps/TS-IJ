@@ -15,9 +15,9 @@ import com.intellij.psi.TokenType;
 %eof{ return;
 %eof}
 
-//https://stackoverflow.com/a/249937/214063
-STRATOM=\"(\\.|[^\"])*\"
-TAGATOM=\'(\\.|[^\'])*\'
+//https://stackoverflow.com/a/10786066/214063
+STRATOM=\"([^\"\\]*(\\.[^\"\\]*)*)\"
+TAGATOM=\'([^\'\\]*(\\.[^\'\\]*)*)\'
 
 DIGIT    =[0-9]
 INTEGER  ={DIGIT}+

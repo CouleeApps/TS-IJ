@@ -33,7 +33,7 @@ public class TSGlobalNSCallCompletionContributor extends CompletionProvider<Comp
                 for (TSFnDeclStmt function : functions) {
                     if (function.isGlobal())
                         continue;
-                    if (namespace != null && !function.getNamespace().equals(namespace))
+                    if (namespace != null && !function.getNamespace().equalsIgnoreCase(namespace))
                         continue;
 
                     result.addElement(
