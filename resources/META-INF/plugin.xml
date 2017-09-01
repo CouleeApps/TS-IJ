@@ -40,6 +40,7 @@
         <annotator implementationClass="com.torquescript.highlighting.TSHighlightingAnnotator" language="TS" />
         <psi.referenceContributor language="TS" implementation="com.torquescript.TSReferenceContributor" />
         <gotoSymbolContributor implementation="com.torquescript.TSChooseByNameContributor" />
+        <lang.braceMatcher language="TS" implementationClass="com.torquescript.TSBraceMatcher"/>
     </extensions>
 
     <actions>
