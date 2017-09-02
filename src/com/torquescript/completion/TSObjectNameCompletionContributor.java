@@ -38,6 +38,7 @@ public class TSObjectNameCompletionContributor extends CompletionProvider<Comple
                         result.addElement(
                                 LookupElementBuilder.create(name)
                                 .withCaseSensitivity(false)
+                                .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
                         );
                     }
                 }

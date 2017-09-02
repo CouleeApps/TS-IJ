@@ -36,18 +36,7 @@ public class TSGlobalVariableCompletionContributor extends CompletionProvider<Co
                     LookupElementBuilder.create(name)
                     .withPresentableText(name)
                     .withCaseSensitivity(false)
-                    .withInsertHandler( new InsertHandler<LookupElement>() {
-                        @Override
-                        public void handleInsert(InsertionContext context, LookupElement item) {
-                            Editor editor = context.getEditor();
-
-                            PsiElement editing = context.getFile().findElementAt(context.getStartOffset());
-                            if (editing != null) {
-                                editor.getDocument().deleteString(editing.getTextOffset(), editing.getTextOffset() + editing.getTextLength());
-                                EditorModificationUtil.insertStringAtCaret(editor, item.getLookupString(), true);
-                            }
-                        }
-                    })
+                    .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }
     }

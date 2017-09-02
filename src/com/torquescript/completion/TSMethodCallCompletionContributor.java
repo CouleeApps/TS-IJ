@@ -30,6 +30,7 @@ public class TSMethodCallCompletionContributor extends CompletionProvider<Comple
                             .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
                             .withBoldness(ns != null && function.getNamespace().equalsIgnoreCase(ns))
                             .withTailText(function.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }
     }

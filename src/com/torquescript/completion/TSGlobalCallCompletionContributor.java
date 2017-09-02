@@ -26,6 +26,7 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
                     LookupElementBuilder.create(function)
                             .withCaseSensitivity(false)
                             .withTailText(function.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }
     }

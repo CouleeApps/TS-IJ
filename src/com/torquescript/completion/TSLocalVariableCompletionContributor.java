@@ -38,6 +38,7 @@ public class TSLocalVariableCompletionContributor extends CompletionProvider<Com
                         LookupElementBuilder.create(prefixless)
                         .withPresentableText(current.getText())
                         .withCaseSensitivity(false)
+                        .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
                 );
             }
         }

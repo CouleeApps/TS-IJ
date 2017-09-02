@@ -36,6 +36,7 @@ public class TSGlobalNSCallCompletionContributor extends CompletionProvider<Comp
                             .withCaseSensitivity(false)
                             .withPresentableText(function.getNamespace() + "::" + function.getFunctionName())
                             .withTailText(function.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }
     }

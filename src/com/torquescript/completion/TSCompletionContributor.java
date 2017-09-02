@@ -19,6 +19,7 @@ import com.torquescript.TSFileType;
 import com.torquescript.TSLanguage;
 import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.xml.bind.Element;
 import java.util.Collection;
