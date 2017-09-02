@@ -273,4 +273,4 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 private array_index_expr ::= expr (COMMA expr)*
 private arg_list ::= expr (COMMA expr)*
 bool_expr ::= TRUE | FALSE
-var_expr ::= GLOBALVAR | LOCALVAR {methods=[getName isLocal]}
+var_expr ::= GLOBALVAR | LOCALVAR {methods=[getName isLocal getReference]}

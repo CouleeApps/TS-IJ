@@ -1,5 +1,6 @@
 package com.torquescript.symbols;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import java.util.Collection;
 
@@ -7,7 +8,7 @@ public class TSCachedList<T> {
     private Collection<T> items = null;
     private TSCachedListGenerator<T> function;
     private long lastUpdate;
-    private static final long CACHE_LIFETIME = 5 * /* ns */ 1000000;
+    private static final long CACHE_LIFETIME = 5 * /* ns */ 1000000000L;
     private static final String LOCK = "Probably slow";
 
     public TSCachedList(TSCachedListGenerator<T> generator) {
@@ -27,6 +28,7 @@ public class TSCachedList<T> {
         }
         //Need to regenerate cache... do this part outside the synchronize because it's slow
         Collection<T> updated = function.generate(project);
+
         //Update safely
         synchronized (LOCK) {
             lastUpdate = System.nanoTime();

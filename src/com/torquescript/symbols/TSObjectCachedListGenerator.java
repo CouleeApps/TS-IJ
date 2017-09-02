@@ -1,5 +1,6 @@
 package com.torquescript.symbols;
 
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
@@ -27,13 +28,10 @@ public class TSObjectCachedListGenerator extends TSCachedListGenerator<TSObjectE
         for (VirtualFile virtualFile : virtualFiles) {
             TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (tsFile != null) {
-                try {
-                    Collection<TSObjectExpr> objects = PsiTreeUtil.findChildrenOfType(tsFile, TSObjectExpr.class);
-                    items.addAll(objects);
-                } catch (Exception ignored) {
-
-                }
+                Collection<TSObjectExpr> objects = PsiTreeUtil.findChildrenOfType(tsFile, TSObjectExpr.class);
+                items.addAll(objects);
             }
+            ProgressManager.progress("Loading Symbols");
         }
         return items;
     }

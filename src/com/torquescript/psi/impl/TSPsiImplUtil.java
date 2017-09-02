@@ -10,6 +10,7 @@ import com.torquescript.TSFunctionType;
 import com.torquescript.TSIcons;
 import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.psi.*;
+import com.torquescript.reference.TSGlobalVariableReference;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -183,6 +184,13 @@ public class TSPsiImplUtil {
             return false;
         }
         return (node.getElementType().equals(TSTypes.LOCALVAR));
+    }
+
+    public static PsiReference getReference(TSVarExpr var) {
+        if (var.isLocal()) {
+            return null;
+        }
+        return new TSGlobalVariableReference(var);
     }
 
     public static String getName(TSObjectExpr obj) {

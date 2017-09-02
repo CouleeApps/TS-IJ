@@ -12,18 +12,7 @@ import com.torquescript.highlighting.TSSyntaxHighlighter;
 import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
 
-public class TSMethodCallAnnotator implements Annotator {
-    //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
-    private static void createSuccessAnnotation(@NotNull PsiElement element, @NotNull AnnotationHolder holder, @NotNull TextAttributesKey key) {
-        holder.createInfoAnnotation(element, null).setEnforcedTextAttributes(TextAttributes.ERASE_MARKER);
-        String description = ApplicationManager.getApplication().isUnitTestMode() ? key.getExternalName() : null;
-        holder.createInfoAnnotation(element, description).setTextAttributes(key);
-    }
-
-    private static void createWarnAnnotation(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        holder.createWarningAnnotation(element, "Can't find function");
-    }
-
+public class TSMethodCallAnnotator extends TSAnnotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         if (element instanceof TSFnNameStmt) {

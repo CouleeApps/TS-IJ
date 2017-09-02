@@ -1,6 +1,7 @@
 package com.torquescript.symbols;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.intellij.openapi.progress.ProgressManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
@@ -30,24 +31,21 @@ public class TSFunctionCachedListGenerator extends TSCachedListGenerator<TSFnDec
         for (VirtualFile virtualFile : virtualFiles) {
             TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
             if (tsFile != null) {
-                try {
-                    TSFnDeclStmt[] functions = PsiTreeUtil.getChildrenOfType(tsFile, TSFnDeclStmt.class);
-                    if (functions != null) {
-                        Collections.addAll(items, functions);
-                    }
+                TSFnDeclStmt[] functions = PsiTreeUtil.getChildrenOfType(tsFile, TSFnDeclStmt.class);
+                if (functions != null) {
+                    Collections.addAll(items, functions);
+                }
 
-                    TSPackageDecl[] packages = PsiTreeUtil.getChildrenOfType(tsFile, TSPackageDecl.class);
-                    if (packages != null) {
-                        for (TSPackageDecl pack : packages) {
-                            functions = PsiTreeUtil.getChildrenOfType(pack, TSFnDeclStmt.class);
-                            if (functions != null) {
-                                Collections.addAll(items, functions);
-                            }
+                TSPackageDecl[] packages = PsiTreeUtil.getChildrenOfType(tsFile, TSPackageDecl.class);
+                if (packages != null) {
+                    for (TSPackageDecl pack : packages) {
+                        functions = PsiTreeUtil.getChildrenOfType(pack, TSFnDeclStmt.class);
+                        if (functions != null) {
+                            Collections.addAll(items, functions);
                         }
                     }
-                } catch (Exception ignored) {
-
                 }
+                ProgressManager.progress("Loading Symbols");
             }
         }
         return items;

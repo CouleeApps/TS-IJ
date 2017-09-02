@@ -5,7 +5,6 @@ E easy (probably)
 E Commenter
   Classes with the completion for stuff we can check
   Pin and recoverWhile for the grammar so typing doesn't blow up the whole file
-  Global variable references (?)
   Local variable references
   Objects can be references too
   Package functions?
