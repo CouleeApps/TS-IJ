@@ -1,12 +1,10 @@
 E easy (probably)
 
-  Class name annotator
   Docstring in the popup
 E Commenter
   Classes with the completion for stuff we can check
   Pin and recoverWhile for the grammar so typing doesn't blow up the whole file
   Local variable references
-  Objects can be references too
   Package functions?
   Path completion in strings
 E Function decls should be references to themselves

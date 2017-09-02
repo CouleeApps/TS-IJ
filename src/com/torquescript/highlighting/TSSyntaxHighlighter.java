@@ -36,6 +36,7 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey FUNCTION = createTextAttributesKey("TS_FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION);
     public static final TextAttributesKey CLASSNAME = createTextAttributesKey("TS_CLASSNAME", DefaultLanguageHighlighterColors.CLASS_NAME);
     public static final TextAttributesKey FUNCTION_CALL = createTextAttributesKey("TS_FUNCTION_CALL", DefaultLanguageHighlighterColors.FUNCTION_CALL);
+    public static final TextAttributesKey OBJECT_NAME = createTextAttributesKey("TS_OBJECT_NAME", DefaultLanguageHighlighterColors.IDENTIFIER);
 
     public static final Map<IElementType, TextAttributesKey[]> KEYS = new HashMap<>();
     public static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];

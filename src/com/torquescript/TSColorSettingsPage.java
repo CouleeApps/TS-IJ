@@ -14,6 +14,7 @@ import java.util.Map;
 
 public class TSColorSettingsPage implements ColorSettingsPage {
     private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[] {
+            new AttributesDescriptor("Object Name", TSSyntaxHighlighter.OBJECT_NAME)
     };
 
     @Nullable

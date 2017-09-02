@@ -11,6 +11,7 @@ import com.torquescript.TSIcons;
 import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.psi.*;
 import com.torquescript.reference.TSGlobalVariableReference;
+import com.torquescript.reference.TSLiteralReference;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -210,7 +211,7 @@ public class TSPsiImplUtil {
         if (!(nameNode instanceof TSLiteralExpr)) {
             return null;
         }
-        return nameNode.getFirstChild().getText();
+        return ((TSLiteralExpr) nameNode).getName();
     }
 
     public static String getClassName(TSObjectExpr obj) {
@@ -296,10 +297,29 @@ public class TSPsiImplUtil {
 
     public static boolean isParentCall(TSCallExpr call) {
         PsiElement first = call.getFirstChild();
-        return (first.getNode().getElementType() == TSTypes.PARENT);
+        return (first.getNode().getElementType().equals(TSTypes.PARENT));
     }
 
     public static TSFnDeclStmt getParentFunction(TSCallExpr call) {
         return PsiTreeUtil.getParentOfType(call, TSFnDeclStmt.class);
     }
+
+    public static String getName(TSLiteralExpr expr) {
+        if (expr.getFirstChild().getNode().getElementType().equals(TSTypes.STRATOM)) {
+            String text = expr.getText();
+            if (text.length() > 1) {
+                return text.substring(1, text.length() - 1);
+            }
+        }
+        return expr.getText();
+    }
+
+    public static PsiReference getReference(TSLiteralExpr expr) {
+        TextRange range = new TextRange(0, expr.getTextLength());
+        if (expr.getFirstChild().getNode().getElementType().equals(TSTypes.STRATOM) && expr.getTextLength() > 1) {
+            range = new TextRange(1, expr.getTextLength() - 1);
+        }
+        return new TSLiteralReference(expr, range);
+    }
+
 }

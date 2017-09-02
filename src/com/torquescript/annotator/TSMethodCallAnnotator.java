@@ -54,7 +54,7 @@ public class TSMethodCallAnnotator extends TSAnnotator {
                 if (valid) {
                     createSuccessAnnotation(name, holder, TSSyntaxHighlighter.FUNCTION_CALL);
                 } else {
-                    createWarnAnnotation(name, holder);
+                    createWarnAnnotation(name, holder, "Can't find function");
                 }
             }
         }

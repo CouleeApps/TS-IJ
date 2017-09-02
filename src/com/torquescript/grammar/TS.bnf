@@ -259,12 +259,13 @@ fake call_expr ::= {methods=[getReference getFunctionName getNameNode getFunctio
 call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_method_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+
 //Access group
 ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_expr ::= expr DOT ID
 //Primary group
-literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_expr | bool_expr | ID
+literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_expr | bool_expr | ID {methods=[getName getReference]}
 paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 
 //-----------------------------------------------------------------------------

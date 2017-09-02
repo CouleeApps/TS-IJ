@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 public class TSAnnotator implements Annotator {
     private static TSAnnotator[] annotators = new TSAnnotator[]{
             new TSMethodCallAnnotator(),
-            new TSClassNameAnnotator()
+            new TSClassNameAnnotator(),
+            new TSObjectAnnotator()
     };
 
     //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
@@ -21,8 +22,8 @@ public class TSAnnotator implements Annotator {
         holder.createInfoAnnotation(element, description).setTextAttributes(key);
     }
 
-    void createWarnAnnotation(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        holder.createWarningAnnotation(element, "Can't find function");
+    void createWarnAnnotation(@NotNull PsiElement element, @NotNull AnnotationHolder holder, @NotNull String message) {
+        holder.createWarningAnnotation(element, message);
     }
 
     @Override
