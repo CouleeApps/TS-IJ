@@ -10,6 +10,6 @@ public class TSFileTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
         fileTypeConsumer.consume(TSFileType.INSTANCE, "cs");
-        fileTypeConsumer.consume(TSFileType.INSTANCE, "gui");
+        fileTypeConsumer.consume(TSGuiFileType.INSTANCE, "gui");
     }
 }
