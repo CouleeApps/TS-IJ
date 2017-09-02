@@ -6,14 +6,11 @@ import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.torquescript.TSReference;
+import com.torquescript.TSFunctionType;
+import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.highlighting.TSSyntaxHighlighter;
 import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
-
-import static com.torquescript.highlighting.TSSyntaxHighlighter.*;
 
 public class TSMethodCallAnnotator implements Annotator {
     //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
@@ -32,7 +29,7 @@ public class TSMethodCallAnnotator implements Annotator {
         if (element instanceof TSFnNameStmt) {
             TSFnNameStmt fn = (TSFnNameStmt) element;
 
-            if (fn.isGlobal()) {
+            if (fn.getFunctionType() == TSFunctionType.GLOBAL) {
                 PsiElement name = fn.getFirstChild();
                 createSuccessAnnotation(name, holder, TSSyntaxHighlighter.FUNCTION);
             } else {
@@ -46,7 +43,7 @@ public class TSMethodCallAnnotator implements Annotator {
 
         if (element instanceof TSCallExpr) {
             boolean valid = false;
-            TSReference ref = (TSReference)element.getReference();
+            TSFunctionCallReference ref = (TSFunctionCallReference)element.getReference();
             PsiElement name = null;
             if (ref != null) {
                 valid = ref.multiResolve(false).length > 0;
@@ -57,7 +54,9 @@ public class TSMethodCallAnnotator implements Annotator {
                 PsiElement namespace = element.getFirstChild();
                 name = namespace.getNextSibling().getNextSibling();
 
-                createSuccessAnnotation(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                if (!((TSCallGlobalNsExpr) element).isParentCall()) {
+                    createSuccessAnnotation(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                }
             } else if (element instanceof TSCallMethodExpr) {
                 PsiElement target = element.getFirstChild();
                 name = target.getNextSibling().getNextSibling();

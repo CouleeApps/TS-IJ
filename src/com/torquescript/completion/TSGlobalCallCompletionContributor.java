@@ -6,6 +6,7 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.util.ProcessingContext;
+import com.torquescript.TSFunctionType;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSFnDeclStmt;
 import org.jetbrains.annotations.NotNull;
@@ -19,7 +20,7 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
         Project project = parameters.getOriginalFile().getProject();
         Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         for (TSFnDeclStmt function : functions) {
-            if (!function.isGlobal())
+            if (function.getFunctionType() != TSFunctionType.GLOBAL)
                 continue;
 
             result.addElement(

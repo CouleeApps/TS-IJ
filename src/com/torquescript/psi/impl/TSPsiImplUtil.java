@@ -6,14 +6,13 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.torquescript.TSFunctionType;
 import com.torquescript.TSIcons;
-import com.torquescript.TSReference;
-import com.torquescript.TSUtil;
+import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.psi.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.util.List;
 
 public class TSPsiImplUtil {
     public static String getName(TSFnDeclStmt element) {
@@ -60,12 +59,12 @@ public class TSPsiImplUtil {
         return name.getNamespace();
     }
 
-    public static boolean isGlobal(TSFnDeclStmt element) {
+    public static TSFunctionType getFunctionType(TSFnDeclStmt element) {
         TSFnNameStmt name = PsiTreeUtil.getChildOfType(element, TSFnNameStmt.class);
         if (name == null) {
-            return false;
+            return null;
         }
-        return name.isGlobal();
+        return name.getFunctionType();
     }
 
     public static String getArgList(TSFnDeclStmt element) {
@@ -78,15 +77,18 @@ public class TSPsiImplUtil {
         }
     }
 
-
     public static String getFunctionName(TSFnNameStmt element) {
-        ASTNode nameNode;
+        ASTNode nameNode = null;
         //Find which node contains our function name
-        if (isGlobal(element)) {
-            nameNode = element.getNode().findChildByType(TSTypes.ID);
-        } else {
-            ASTNode anchor = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
-            nameNode = element.getNode().findChildByType(TSTypes.ID, anchor);
+        switch (getFunctionType(element)) {
+            case GLOBAL:
+                nameNode = element.getNode().findChildByType(TSTypes.ID);
+                break;
+            case GLOBAL_NS:
+            case METHOD:
+                ASTNode anchor = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
+                nameNode = element.getNode().findChildByType(TSTypes.ID, anchor);
+                break;
         }
         if (nameNode == null) {
             return null;
@@ -99,7 +101,7 @@ public class TSPsiImplUtil {
             @Nullable
             @Override
             public String getPresentableText() {
-                if (function.isGlobal()) {
+                if (function.getFunctionType() == TSFunctionType.GLOBAL) {
                     return function.getFunctionName();
                 } else {
                     return function.getNamespace() + "::" + function.getFunctionName();
@@ -121,7 +123,7 @@ public class TSPsiImplUtil {
     }
 
     public static String getNamespace(TSFnNameStmt element) {
-        if (isGlobal(element)) {
+        if (element.getFunctionType() == TSFunctionType.GLOBAL) {
             return null;
         }
 
@@ -134,10 +136,29 @@ public class TSPsiImplUtil {
         return nsNode.getText();
     }
 
-    public static boolean isGlobal(TSFnNameStmt element) {
+    public static TSFunctionType getFunctionType(TSFnNameStmt element) {
         //If we have a double colon that counts as a namespace
         ASTNode doubleColon = element.getNode().findChildByType(TSTypes.COLON_DOUBLE);
-        return doubleColon == null;
+        if (doubleColon == null) {
+            return TSFunctionType.GLOBAL;
+        }
+
+        //In general, methods have a first arg of %this
+        TSVarList varList = PsiTreeUtil.getNextSiblingOfType(element, TSVarList.class);
+
+        //No var list? Must be global ns then
+        if (varList == null) {
+            return TSFunctionType.GLOBAL_NS;
+        }
+
+        //Not %this first? Global ns
+        TSVarExpr firstVar = PsiTreeUtil.getChildOfType(varList, TSVarExpr.class);
+        if (firstVar.getName().equalsIgnoreCase("this")) {
+            return TSFunctionType.METHOD;
+        }
+
+        //Probably global ns
+        return TSFunctionType.GLOBAL_NS;
     }
 
     public static String getName(TSVarExpr variable) {
@@ -197,7 +218,7 @@ public class TSPsiImplUtil {
         if (nameNode == null) {
             return null;
         }
-        return new TSReference(call, new TextRange(nameNode.getStartOffsetInParent(), nameNode.getStartOffsetInParent() + nameNode.getTextLength()));
+        return new TSFunctionCallReference(call, nameNode);
     }
 
     public static String getFunctionName(TSCallExpr call) {
@@ -210,10 +231,8 @@ public class TSPsiImplUtil {
 
     public static PsiElement getNameNode(TSCallExpr call) {
         PsiElement nameElement = null;
-        if (call instanceof TSCallGlobalExpr) {
-            //First element is the function name
-            nameElement = call.getFirstChild();
-        } else {
+
+        if (call.isParentCall()) {
             //Third
             nameElement = call.getFirstChild();
             if (nameElement != null) {
@@ -222,10 +241,57 @@ public class TSPsiImplUtil {
             if (nameElement != null) {
                 nameElement = nameElement.getNextSibling();
             }
+        } else {
+            if (call.getFunctionType() == TSFunctionType.GLOBAL) {
+                //First element is the function name
+                nameElement = call.getFirstChild();
+            } else {
+                //Third
+                nameElement = call.getFirstChild();
+                if (nameElement != null) {
+                    nameElement = nameElement.getNextSibling();
+                }
+                if (nameElement != null) {
+                    nameElement = nameElement.getNextSibling();
+                }
+            }
         }
         if (nameElement == null) {
             return null;
         }
         return nameElement;
+    }
+
+    public static TSFunctionType getFunctionType(TSCallExpr call) {
+        if (call instanceof TSCallGlobalExpr) {
+            return TSFunctionType.GLOBAL;
+        } else if (call instanceof TSCallGlobalNsExpr) {
+            //What about parent?
+            if (call.isParentCall()) {
+                //We are whatever our function's type is
+                TSFnDeclStmt fn = call.getParentFunction();
+                if (fn == null) {
+                    //Well then I dunno
+                    return TSFunctionType.GLOBAL_NS;
+                }
+                return fn.getFunctionType();
+            }
+
+            return TSFunctionType.GLOBAL_NS;
+        } else if (call instanceof TSCallMethodExpr) {
+            return TSFunctionType.METHOD;
+        } else {
+            //????
+            return null;
+        }
+    }
+
+    public static boolean isParentCall(TSCallExpr call) {
+        PsiElement first = call.getFirstChild();
+        return (first.getNode().getElementType() == TSTypes.PARENT);
+    }
+
+    public static TSFnDeclStmt getParentFunction(TSCallExpr call) {
+        return PsiTreeUtil.getParentOfType(call, TSFnDeclStmt.class);
     }
 }

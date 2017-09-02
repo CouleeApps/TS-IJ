@@ -37,13 +37,13 @@ package_decl ::=
 fn_decl_stmt ::=
     FUNCTION fn_name_stmt var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
-     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace isGlobal getArgList]}
+     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace getFunctionType getArgList]}
 
 fn_name_stmt ::=
     ID PAREN_OPEN
     |
     ID COLON_DOUBLE ID PAREN_OPEN
-    {methods=[getFunctionName getNamespace isGlobal]}
+{methods=[getFunctionName getNamespace getFunctionType]}
 
 var_list ::=
     var_expr (COMMA var_expr)*
@@ -255,7 +255,7 @@ private assign_block ::=
     (ASSIGN_ADD | ASSIGN_SUB | ASSIGN_MUL | ASSIGN_DIV | ASSIGN_MOD | ASSIGN_AND | ASSIGN_XOR | ASSIGN_OR | ASSIGN_LSHIFT | ASSIGN_RSHIFT) expr
 
 //Call group
-fake call_expr ::= {methods=[getReference getFunctionName getNameNode]}
+fake call_expr ::= {methods=[getReference getFunctionName getNameNode getFunctionType isParentCall getParentFunction]}
 call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_method_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}

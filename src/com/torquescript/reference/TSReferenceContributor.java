@@ -1,4 +1,4 @@
-package com.torquescript;
+package com.torquescript.reference;
 
 import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;

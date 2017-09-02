@@ -1,6 +1,7 @@
 package com.torquescript;
 
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.torquescript.psi.*;
 import com.torquescript.symbols.TSFunctionCachedListGenerator;
@@ -109,5 +110,17 @@ public class TSUtil {
 
         //TODO???
         return null;
+    }
+
+    public static TextRange getRangeOfChild(PsiElement parent, PsiElement child) {
+        TextRange range = new TextRange(child.getStartOffsetInParent(), child.getStartOffsetInParent() + child.getTextLength());
+        while (child.getParent() != parent) {
+            child = child.getParent();
+            if (child == null) {
+                return null;
+            }
+            range = new TextRange(range.getStartOffset() + child.getStartOffsetInParent(), range.getEndOffset() + child.getStartOffsetInParent());
+        }
+        return range;
     }
 }

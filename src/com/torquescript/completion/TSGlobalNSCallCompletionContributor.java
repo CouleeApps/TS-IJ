@@ -11,6 +11,7 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.torquescript.TSFileType;
+import com.torquescript.TSFunctionType;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSFnDeclStmt;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +27,7 @@ public class TSGlobalNSCallCompletionContributor extends CompletionProvider<Comp
         Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
 
         for (TSFnDeclStmt function : functions) {
-            if (function.isGlobal())
+            if (function.getFunctionType() == TSFunctionType.GLOBAL)
                 continue;
             if (namespace != null && !function.getNamespace().equalsIgnoreCase(namespace))
                 continue;

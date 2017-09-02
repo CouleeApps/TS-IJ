@@ -1,13 +1,9 @@
 E easy (probably)
 
-  Apparently GUI files don't search
-  Object name completion caching
-  Variable completion caching
   Class name annotator
   Docstring in the popup
 E Commenter
   Classes with the completion for stuff we can check
-  What's up with the missing builtins?
   Pin and recoverWhile for the grammar so typing doesn't blow up the whole file
   Global variable references (?)
   Local variable references
@@ -25,5 +21,4 @@ E Arg indication in completion popup?
   Annotations:
   Unset variable usage
   Function signature checking
-E Parent is a keyword
 E %this as the first arg to member fns, not to globals
