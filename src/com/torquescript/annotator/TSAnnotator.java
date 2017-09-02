@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class TSAnnotator implements Annotator {
     private static TSAnnotator[] annotators = new TSAnnotator[]{
-            new TSMethodCallAnnotator()
+            new TSMethodCallAnnotator(),
+            new TSClassNameAnnotator()
     };
 
     //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
