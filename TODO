@@ -20,6 +20,7 @@ E Function decls should be references to themselves
   Support for syntax highlighting in commands?
   Outline/structure viewer
 E Arg indication in completion popup?
+  Icons
 
   Annotations:
   Unset variable usage

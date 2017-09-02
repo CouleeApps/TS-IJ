@@ -1,10 +1,12 @@
 package com.torquescript.completion;
 
-import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionProvider;
-import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
@@ -15,6 +17,7 @@ import com.intellij.util.ProcessingContext;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.torquescript.TSFile;
 import com.torquescript.TSFileType;
+import com.torquescript.TSUtil;
 import com.torquescript.psi.TSAssignExpr;
 import com.torquescript.psi.TSVarExpr;
 import org.jetbrains.annotations.NotNull;
@@ -25,30 +28,27 @@ public class TSGlobalVariableCompletionContributor extends CompletionProvider<Co
     @Override
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
         //All global variables
-        Project project = parameters.getOriginalFile().getProject();
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, TSFileType.INSTANCE, GlobalSearchScope.allScope(project));
+        Collection<TSVarExpr> variables = TSUtil.getGlobalList(parameters.getPosition().getProject());
 
-        for (VirtualFile virtualFile : virtualFiles) {
-            TSFile tsFile = (TSFile) PsiManager.getInstance(project).findFile(virtualFile);
-            if (tsFile != null) {
-                Collection<TSAssignExpr> assignments = PsiTreeUtil.findChildrenOfType(tsFile, TSAssignExpr.class);
+        for (TSVarExpr var : variables) {
+            String name = var.getText();
+            result.addElement(
+                    LookupElementBuilder.create(name)
+                    .withPresentableText(name)
+                    .withCaseSensitivity(false)
+                    .withInsertHandler( new InsertHandler<LookupElement>() {
+                        @Override
+                        public void handleInsert(InsertionContext context, LookupElement item) {
+                            Editor editor = context.getEditor();
 
-                for (TSAssignExpr assignment : assignments) {
-                    PsiElement first = assignment.getFirstChild();
-                    if (!(first instanceof TSVarExpr))
-                        continue;
-
-                    if (((TSVarExpr)first).isLocal())
-                        continue;
-
-                    String name = ((TSVarExpr) first).getName();
-                    result.addElement(
-                            LookupElementBuilder.create(name)
-                            .withPresentableText(first.getText())
-                            .withCaseSensitivity(false)
-                    );
-                }
-            }
+                            PsiElement editing = context.getFile().findElementAt(context.getStartOffset());
+                            if (editing != null) {
+                                editor.getDocument().deleteString(editing.getTextOffset(), editing.getTextOffset() + editing.getTextLength());
+                                EditorModificationUtil.insertStringAtCaret(editor, item.getLookupString(), true);
+                            }
+                        }
+                    })
+            );
         }
     }
 }

@@ -23,7 +23,6 @@ public class TSGlobalNSCallCompletionContributor extends CompletionProvider<Comp
         String namespace = parameters.getPosition().getPrevSibling().getPrevSibling().getText();
 
         Project project = parameters.getOriginalFile().getProject();
-        Collection<VirtualFile> virtualFiles = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, TSFileType.INSTANCE, GlobalSearchScope.allScope(project));
         Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
 
         for (TSFnDeclStmt function : functions) {
