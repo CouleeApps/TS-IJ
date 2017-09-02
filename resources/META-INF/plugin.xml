@@ -2,16 +2,14 @@
     <id>com.torquescript.TorqueScriptLang</id>
     <name>Torque Script</name>
     <version>0.1</version>
-    <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+    <vendor email="couleeapps@gmail.com" url="https://github.com/CouleeApps/">Glenn Smith</vendor>
 
     <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
+      Basic WIP Torque Script plugin for IntelliJ editors.
     ]]></description>
 
     <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
+      Initial version.
     ]]>
     </change-notes>
 
@@ -20,9 +18,7 @@
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
-    <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
-    -->
 
     <project-components>
         <component>
@@ -45,7 +41,6 @@
 
     <actions>
         <!-- Add your actions here -->
-
     </actions>
 
 </idea-plugin>
