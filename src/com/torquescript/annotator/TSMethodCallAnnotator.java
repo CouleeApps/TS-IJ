@@ -7,10 +7,14 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.torquescript.TSFunctionType;
+import com.torquescript.TSUtil;
 import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.highlighting.TSSyntaxHighlighter;
 import com.torquescript.psi.*;
+import com.torquescript.reference.TSLiteralReference;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 public class TSMethodCallAnnotator extends TSAnnotator {
     @Override
@@ -25,7 +29,16 @@ public class TSMethodCallAnnotator extends TSAnnotator {
                 PsiElement namespace = fn.getFirstChild();
                 PsiElement name = namespace.getNextSibling().getNextSibling();
 
-                createSuccessAnnotation(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                //TODO: Check if namespace is an object
+                List<TSObjectExpr> objects = TSUtil.findObject(element.getProject(), namespace.getText());
+                if (objects.size() > 0) {
+                    //Object method
+                    createSuccessAnnotation(namespace, holder, TSSyntaxHighlighter.OBJECT_NAME);
+                } else {
+                    //Class method
+                    createSuccessAnnotation(namespace, holder, TSSyntaxHighlighter.CLASSNAME);
+                }
+
                 createSuccessAnnotation(name, holder, TSSyntaxHighlighter.FUNCTION);
             }
         }

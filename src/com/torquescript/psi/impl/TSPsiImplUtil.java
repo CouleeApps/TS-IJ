@@ -208,10 +208,13 @@ public class TSPsiImplUtil {
         if (nameNode == null) {
             return null;
         }
-        if (!(nameNode instanceof TSLiteralExpr)) {
-            return null;
+        if (nameNode instanceof TSLiteralExpr) {
+            return ((TSLiteralExpr) nameNode).getName();
         }
-        return ((TSLiteralExpr) nameNode).getName();
+        if (nameNode.getNode().getElementType().equals(TSTypes.ID)) {
+            return nameNode.getText();
+        }
+        return null;
     }
 
     public static String getClassName(TSObjectExpr obj) {
@@ -315,11 +318,7 @@ public class TSPsiImplUtil {
     }
 
     public static PsiReference getReference(TSLiteralExpr expr) {
-        TextRange range = new TextRange(0, expr.getTextLength());
-        if (expr.getFirstChild().getNode().getElementType().equals(TSTypes.STRATOM) && expr.getTextLength() > 1) {
-            range = new TextRange(1, expr.getTextLength() - 1);
-        }
-        return new TSLiteralReference(expr, range);
+        return new TSLiteralReference(expr);
     }
 
 }

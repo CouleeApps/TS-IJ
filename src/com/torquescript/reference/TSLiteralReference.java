@@ -9,19 +9,31 @@ import com.torquescript.TSIcons;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSLiteralExpr;
 import com.torquescript.psi.TSObjectExpr;
+import com.torquescript.psi.TSTypes;
 import com.torquescript.psi.TSVarExpr;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.xml.soap.Text;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class TSLiteralReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String name;
-    public TSLiteralReference(TSLiteralExpr var, TextRange range) {
-        super(var, range);
-        name = var.getName();
+
+    private static TextRange getLiteralRange(TSLiteralExpr expr) {
+        TextRange range = new TextRange(0, expr.getTextLength());
+        if (expr.getFirstChild().getNode().getElementType().equals(TSTypes.STRATOM) && expr.getTextLength() > 1) {
+            range = new TextRange(1, expr.getTextLength() - 1);
+        }
+
+        return range;
+    }
+
+    public TSLiteralReference(TSLiteralExpr expr) {
+        super(expr, getLiteralRange(expr));
+        name = expr.getName();
     }
 
     @NotNull

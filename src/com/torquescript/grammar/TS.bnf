@@ -88,6 +88,8 @@ for_stmt ::=
 
 datablock_decl ::=
     DATABLOCK ID PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
+    {extends=object_expr
+    methods=[getName getClassName getParentName]}
 
 switch_stmt ::=
     SWITCH PAREN_OPEN expr PAREN_CLOSE BRACE_OPEN case_stmt* default_stmt? BRACE_CLOSE
