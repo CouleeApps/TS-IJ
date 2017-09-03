@@ -6,30 +6,30 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 
-public class TSGuiFileType extends LanguageFileType {
+public class TSMisFileType extends LanguageFileType {
 
-    public static final TSGuiFileType INSTANCE = new TSGuiFileType();
+    public static final TSMisFileType INSTANCE = new TSMisFileType();
 
-    private TSGuiFileType() {
+    private TSMisFileType() {
         super(TSLanguage.INSTANCE);
     }
 
     @NotNull
     @Override
     public String getName() {
-        return "GUI File";
+        return "Mission File";
     }
 
     @NotNull
     @Override
     public String getDescription() {
-        return "TorqueScript GUI file";
+        return "TorqueScript Mission file";
     }
 
     @NotNull
     @Override
     public String getDefaultExtension() {
-        return "gui";
+        return "mis";
     }
 
     @Nullable

@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class TSFileTypeFactory extends FileTypeFactory {
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer fileTypeConsumer) {
-        fileTypeConsumer.consume(TSFileType.INSTANCE, "cs");
-        fileTypeConsumer.consume(TSGuiFileType.INSTANCE, "gui");
+        fileTypeConsumer.consume(TSFileType.INSTANCE, "cs" + FileTypeConsumer.EXTENSION_DELIMITER + "gui");
+        fileTypeConsumer.consume(TSMisFileType.INSTANCE, "mis");
     }
 }

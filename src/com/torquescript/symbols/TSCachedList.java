@@ -8,7 +8,7 @@ public class TSCachedList<T> {
     private Collection<T> items = null;
     private TSCachedListGenerator<T> function;
     private long lastUpdate;
-    private static final long CACHE_LIFETIME = 5 * /* ns */ 1000000000L;
+    private static final long CACHE_LIFETIME = 15 * /* ns */ 1000000000L;
     private static final String LOCK = "Probably slow";
 
     public TSCachedList(TSCachedListGenerator<T> generator) {
@@ -56,5 +56,9 @@ public class TSCachedList<T> {
             }
             return needUpdate;
         }
+    }
+
+    public void setDirty() {
+        lastUpdate = 0;
     }
 }
