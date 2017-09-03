@@ -8,12 +8,15 @@ import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Annotator class that provides highlighting for function calls and objects references in the source.
+ */
 public class TSAnnotator implements Annotator {
-    private static TSAnnotator[] annotators = new TSAnnotator[]{
+    private static final ThreadLocal<TSAnnotator[]> annotators = ThreadLocal.withInitial(() -> new TSAnnotator[]{
             new TSMethodCallAnnotator(),
             new TSClassNameAnnotator(),
             new TSObjectAnnotator()
-    };
+    });
 
     //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
     void createSuccessAnnotation(@NotNull PsiElement element, @NotNull AnnotationHolder holder, @NotNull TextAttributesKey key) {
@@ -28,7 +31,7 @@ public class TSAnnotator implements Annotator {
 
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        for (TSAnnotator annotator : annotators) {
+        for (TSAnnotator annotator : annotators.get()) {
             annotator.annotate(element, holder);
         }
     }

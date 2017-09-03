@@ -10,6 +10,10 @@ import com.torquescript.psi.*;
 import com.torquescript.reference.TSFunctionCallReference;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Highlights class names in object and datablock declarations. If the class name is actually an object name it will
+ * highlight with the object attribute instead.
+ */
 public class TSClassNameAnnotator extends TSAnnotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
@@ -17,7 +21,8 @@ public class TSClassNameAnnotator extends TSAnnotator {
         if (element instanceof  TSDatablockDecl) {
             TSDatablockDecl db = (TSDatablockDecl) element;
 
-            //Find the first id node
+            //Find the first id node, this is kinda wonky since we have to account for whitespace nodes
+            //datablock ClassName(...)
             ASTNode node = db.getNode();
             if (node == null) {
                 return;
@@ -30,7 +35,8 @@ public class TSClassNameAnnotator extends TSAnnotator {
         } else if (element instanceof TSObjectExpr) {
             TSObjectExpr obj = (TSObjectExpr) element;
 
-            //Class name should be the second thing in the element
+            //Class name should be the second thing in the element:
+            // new ClassName(...)
             classElement = PsiTreeUtil.getChildOfType(obj, TSClassNameExpr.class);
 
             if (classElement == null) {

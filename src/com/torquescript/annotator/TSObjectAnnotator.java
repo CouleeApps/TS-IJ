@@ -12,6 +12,9 @@ import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.reference.TSLiteralReference;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Highlights text literals that are also declared objects
+ */
 public class TSObjectAnnotator extends TSAnnotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
