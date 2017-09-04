@@ -26,6 +26,9 @@ import java.util.Collection;
 
 import static com.intellij.patterns.PlatformPatterns.*;
 
+/**
+ * Base class that provides autocomplete suggestions
+ */
 public class TSCompletionContributor extends CompletionContributor {
     public TSCompletionContributor() {
         extend(CompletionType.BASIC, isKeywordable(), new TSKeywordCompletionContributor());
@@ -43,6 +46,7 @@ public class TSCompletionContributor extends CompletionContributor {
         if (typeChar == ':' && position.getNode().getElementType().equals(TSTypes.COLON)) {
             return true;
         }
+        //Variable prefixes
         if (typeChar == '%' || typeChar == '$') {
             return true;
         }

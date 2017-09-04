@@ -7,7 +7,11 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.EditorModificationUtil;
 import com.intellij.psi.PsiElement;
 
+/**
+ * Corrects case of global variables and functions when you insert them... doesn't work with local variables though
+ */
 public class TSCaseCorrectingInsertHandler implements InsertHandler<LookupElement> {
+    //Singleton because we don't need more than one of these
     public static InsertHandler<LookupElement> INSTANCE = new TSCaseCorrectingInsertHandler();
 
     @Override
@@ -24,5 +28,4 @@ public class TSCaseCorrectingInsertHandler implements InsertHandler<LookupElemen
             EditorModificationUtil.insertStringAtCaret(editor, item.getLookupString(), true);
         }
     }
-
 }
