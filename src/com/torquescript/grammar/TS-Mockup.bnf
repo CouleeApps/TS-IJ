@@ -172,13 +172,13 @@ expr ::=
     |
     bitwise_group
     |
+    conditional_group
+    |
     add_group
     |
     mul_group
     |
     unary_math_group
-    |
-    conditional_group
     |
     concat_group
     |

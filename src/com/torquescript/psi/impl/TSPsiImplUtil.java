@@ -340,4 +340,20 @@ public class TSPsiImplUtil {
 
         return null;
     }
+
+
+    public static PsiElement setName(TSPackageDecl element, String newName) {
+        ASTNode nameNode = element.getNode().findChildByType(TSTypes.ID);
+
+        if (nameNode != null) {
+            TSPackageDecl stmt = TSElementFactory.createPackageDecl(element.getProject(), newName);
+            ASTNode newNameNode = stmt.getNode().findChildByType(TSTypes.ID);
+            if (newNameNode != null) {
+                element.getNode().replaceChild(nameNode, newNameNode);
+            }
+        }
+
+        return element;
+    }
+
 }

@@ -34,7 +34,7 @@ private decl ::=
 package_decl ::=
     PACKAGE ID BRACE_OPEN fn_decl_stmt* BRACE_CLOSE SEMICOLON
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement"
-    methods=[getName getNameIdentifier]}
+    methods=[getName getNameIdentifier setName]}
 
 fn_decl_stmt ::=
     FUNCTION fn_name_stmt var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
@@ -153,13 +153,13 @@ expr ::=
     |
     bitwise_group
     |
+    conditional_group
+    |
     add_group
     |
     mul_group
     |
     unary_math_group
-    |
-    conditional_group
     |
     concat_group
     |

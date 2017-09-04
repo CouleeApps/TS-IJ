@@ -12,6 +12,11 @@ public class TSElementFactory {
         return (TSFnDeclStmt) file.getFirstChild();
     }
 
+    public static TSPackageDecl createPackageDecl(Project project, String name) {
+        final TSFile file = createFile(project, "package " + name + "{};");
+        return (TSPackageDecl) file.getFirstChild();
+    }
+
     @NotNull
     public static TSFile createFile(Project project, String text) {
         String fileName = "dummy.cs";
