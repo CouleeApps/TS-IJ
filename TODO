@@ -1,7 +1,6 @@
 E easy (probably)
 
   Docstring in the popup
-E Commenter
   Classes with the completion for stuff we can check
   Pin and recoverWhile for the grammar so typing doesn't blow up the whole file
   Local variable references
