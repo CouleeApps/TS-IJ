@@ -321,4 +321,23 @@ public class TSPsiImplUtil {
         return new TSLiteralReference(expr);
     }
 
+    public static String getName(TSPackageDecl pkg) {
+        //First id token is the name
+        ASTNode nameNode = pkg.getNode().findChildByType(TSTypes.ID);
+        if (nameNode == null) {
+            return null;
+        }
+
+        return nameNode.getText();
+    }
+
+    public static PsiElement getNameIdentifier(TSPackageDecl element) {
+        ASTNode nameNode = element.getNode().findChildByType(TSTypes.ID);
+
+        if (nameNode != null) {
+            return nameNode.getPsi();
+        }
+
+        return null;
+    }
 }

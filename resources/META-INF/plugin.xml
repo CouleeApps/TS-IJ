@@ -38,6 +38,7 @@
         <gotoSymbolContributor implementation="com.torquescript.TSChooseByNameContributor" />
         <lang.braceMatcher language="TS" implementationClass="com.torquescript.TSBraceMatcher"/>
         <lang.findUsagesProvider language="TS" implementationClass="com.torquescript.TSFindUsagesProvider" />
+        <lang.foldingBuilder language="TS" implementationClass="com.torquescript.TSFoldingBuilder" />
     </extensions>
 
     <actions>
