@@ -17,9 +17,11 @@
     tokenTypeClass="com.torquescript.psi.TSTokenType"
 
     psiImplUtilClass="com.torquescript.psi.impl.TSPsiImplUtil"
+    parserUtilClass="com.torquescript.parser.TSParserUtil"
 
     name(".*expr")='expression'
     extends(".*expr")='expr'
+    consumeTokenMethod(".*expr")="consumeTokenFast"
 }
 
 tsFile ::= decl *
@@ -41,6 +43,7 @@ fn_decl_stmt ::=
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
      methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace getFunctionType getArgList]}
 
+// Needs the PAREN_OPEN otherwise NS functions will match as global
 fn_name_stmt ::=
     ID PAREN_OPEN
     |
@@ -48,9 +51,9 @@ fn_name_stmt ::=
 {methods=[getFunctionName getNamespace getFunctionType]}
 
 var_list ::=
-    var_expr (COMMA var_expr)*
+    var_group (COMMA var_group)*
 
-stmt ::=
+private stmt ::=
     if_stmt
     |
     while_stmt
@@ -134,16 +137,7 @@ field_assign ::=
 expression_stmt ::=
     expr_stmt_group SEMICOLON
 
-private expr_stmt_group ::=
-      object_expr
-    | assign_var_expr
-    | assign_index_expr
-    | assign_ref_expr // ***
-    | assign_ref_index_expr // ***
-    | call_global_expr
-    | call_global_ns_expr
-    | call_method_expr // ***
-//Allowing any *** will allow literal statements to be valid expressions
+external expr_stmt_group ::= parseExpressionStmtGroup
 
 //-----------------------------------------------------------------------------
 
@@ -247,8 +241,8 @@ private pissy_group ::=
 
 //Assign group, can't shorten this with access_group because it has to be specific
 fake assign_expr ::=
-assign_var_expr ::= var_expr assign_block {rightAssociative=true extends=assign_expr}
-assign_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
+assign_var_expr ::= var_group assign_block {rightAssociative=true extends=assign_expr}
+assign_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
 assign_ref_expr ::= expr DOT ID assign_block {rightAssociative=true extends=assign_expr}
 assign_ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
 
@@ -266,11 +260,11 @@ call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN
 call_method_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 
 //Access group
-ref_var_index_expr ::= var_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE
+ref_var_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE
 ref_expr ::= expr DOT ID
 //Primary group
-literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_expr | bool_expr | ID {methods=[getName getReference]}
+literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_group | bool_expr | ID {methods=[getName getReference]}
 paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 
 //-----------------------------------------------------------------------------
@@ -279,4 +273,9 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 private array_index_expr ::= expr (COMMA expr)*
 private arg_list ::= expr (COMMA expr)*
 bool_expr ::= TRUE | FALSE
-var_expr ::= GLOBALVAR | LOCALVAR {methods=[getName isLocal getReference]}
+
+fake var_expr ::= {methods=[getName isLocal getReference]}
+private global_var ::= GLOBALVAR {extends=var_expr}
+private local_var ::= LOCALVAR {extends=var_expr}
+
+private var_group ::= global_var | local_var

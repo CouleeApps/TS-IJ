@@ -50,6 +50,7 @@
     extends(".*stmt")='stmt'
     name(".*expr")='expression'
     extends(".*expr")='expr'
+    consumeTokenMethod(".*expr")="consumeTokenFast"
 }
 
 tsFile ::= decl *
@@ -60,14 +61,20 @@ decl ::=
     fn_decl_stmt
     |
     package_decl
+    {recoverWhile="decl_recover"}
+
+private decl_recover ::= !(rwPACKAGE | rwFUNCTION | '}')
 
 package_decl ::=
-    rwPACKAGE ID '{' fn_decl_stmt* '}' ';'
+    rwPACKAGE ID '{' fn_decl_stmt* '}' ';' {pin=1}
 
 fn_decl_stmt ::=
-    rwFUNCTION ID '(' var_list? ')' '{' stmt* '}'
+    rwFUNCTION fn_name_stmt ('(' var_list? ')') curly_stmt_block {pin(".*")=1}
+
+fn_name_stmt ::=
+    ID
     |
-    rwFUNCTION ID '::' ID '(' var_list? ')' '{' stmt* '}'
+    ID '::' ID
 
 var_list ::=
     VAR (',' VAR)*
@@ -96,37 +103,41 @@ stmt ::=
 
 if_stmt ::=
 //Most specific rule comes first, so that means the else-case
-    rwIF '(' expr ')' stmt_block rwELSE stmt_block
-    |
-    rwIF '(' expr ')' stmt_block
+    rwIF paren_conditional_block stmt_block (rwELSE stmt_block)?
+    {pin(".*")=1}
 
 while_stmt ::=
-    rwWHILE '(' expr ')' stmt_block
+    rwWHILE paren_conditional_block stmt_block
     //Do-while not in MBTS
+    {pin(".*")=1}
 
 for_stmt ::=
     rwFOR '(' expr ';' expr ';' expr ')' stmt_block
     //Partial for not in MBTS
+    {pin(".*")=1}
 
 datablock_decl ::=
-    rwDATABLOCK ID '(' ID (':' ID)? ')' '{' field_list '}' ';'
+    rwDATABLOCK ID ('(' ID (':' ID)? ')') ('{' field_list '}') ';'
+    {pin(".*")=1}
 
 switch_stmt ::=
-    rwSWITCH '(' expr ')' '{' case_stmt* default_stmt? '}'
+    rwSWITCH paren_conditional_block '{' case_stmt* default_stmt? '}'
     |
-    rwSWITCHSTR '(' expr ')' '{' case_stmt* default_stmt? '}'
+    rwSWITCHSTR paren_conditional_block '{' case_stmt* default_stmt? '}'
 
 case_stmt ::=
     rwCASE case_expr ':' stmt*
+    {pin(".*")=1}
 
 default_stmt ::=
     rwDEFAULT ':' stmt*
+    {pin(".*")=1}
 
 case_expr ::=
     expr (rwCASEOR expr)*
 
-break_stmt ::= rwBREAK ';'
-continue_stmt ::= rwCONTINUE ';'
+break_stmt ::= rwBREAK ';' {pin(".*")=1}
+continue_stmt ::= rwCONTINUE ';' {pin(".*")=1}
 return_stmt ::=
     rwRETURN ';'
     |
@@ -134,9 +145,17 @@ return_stmt ::=
 
 //Block of statements eg after an if condition
 stmt_block ::=
-    '{' stmt* '}'
+    curly_stmt_block
     |
     stmt
+
+private curly_stmt_block ::=
+    '{' stmt* '}'
+    {pin=1}
+
+private paren_conditional_block ::=
+    '(' expr ')'
+    {pin=1}
 
 field_list ::=
     field_assign+
@@ -151,10 +170,11 @@ field_assign ::=
 //Statement that is just an expression and a semi
 expression_stmt ::=
     expr_stmt_group ';'
+    {pin=2}
     
 private expr_stmt_group ::=
 dummy
-    | object_decl
+    | object_expr
     | assign_var_expr
     | assign_index_expr
     | assign_ref_expr // ***
@@ -201,12 +221,8 @@ private conditional_group ::= conditional_expr
 private concat_group ::= concat_expr | concat_space_expr | concat_tab_expr | concat_nl_expr
 private unary_bool_group ::= not_expr | bit_not_expr
 
-//Object declaration is pretty straightforward
-private object_decl ::=
-    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' '{' field_assign* (object_decl ';')* '}'
-    |
-    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')'
-object_expr ::= object_decl
+object_expr ::=
+    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' ('{' field_assign* (object_expr ';')* '}')?
 
 class_name_expr ::=
     ID

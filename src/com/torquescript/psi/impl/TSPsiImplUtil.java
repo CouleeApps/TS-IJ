@@ -155,6 +155,10 @@ public class TSPsiImplUtil {
 
         //Not %this first? Global ns
         TSVarExpr firstVar = PsiTreeUtil.getChildOfType(varList, TSVarExpr.class);
+        if (firstVar == null) {
+            //No first var means no %this so global ns
+            return TSFunctionType.GLOBAL_NS;
+        }
         if (firstVar.getName().equalsIgnoreCase("this")) {
             return TSFunctionType.METHOD;
         }
