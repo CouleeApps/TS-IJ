@@ -40,6 +40,8 @@
         <lang.findUsagesProvider language="TS" implementationClass="com.torquescript.TSFindUsagesProvider" />
         <lang.foldingBuilder language="TS" implementationClass="com.torquescript.TSFoldingBuilder" />
         <lang.commenter language="TS" implementationClass="com.torquescript.TSCommenter" />
+
+        <configurationType implementation="com.torquescript.runner.TSRunConfigurationType"/>
     </extensions>
 
     <actions>
