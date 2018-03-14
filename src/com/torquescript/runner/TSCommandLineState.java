@@ -14,9 +14,10 @@ import java.util.List;
  * Created on 3/13/18.
  */
 public class TSCommandLineState extends CommandLineState {
+    @NotNull
     private TSRunConfiguration runConfiguration;
 
-    public TSCommandLineState(TSRunConfiguration runConfiguration, ExecutionEnvironment environment) {
+    public TSCommandLineState(@NotNull TSRunConfiguration runConfiguration, ExecutionEnvironment environment) {
         super(environment);
         this.runConfiguration = runConfiguration;
     }

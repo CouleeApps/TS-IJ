@@ -29,7 +29,7 @@ VARTAIL  ={VARMID}*{IDTAIL}
 LOCALVAR ="%"{LETTER}{VARTAIL}*
 GLOBALVAR="$"{LETTER}{VARTAIL}*
 ID       ={LETTER}{IDTAIL}*
-SPACE    =[ \t\v\f]
+SPACE    =[ \t\f]
 CRLF     =[\r\n]
 COMMENT  ="//"[^\r\n]*
 

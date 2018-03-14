@@ -30,6 +30,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeFactory implementation="com.torquescript.TSFileTypeFactory" />
         <lang.parserDefinition language="TS" implementationClass="com.torquescript.TSParserDefinition" />
+        <lang.parserDefinition language="TSClassDump" implementationClass="com.torquescript.symbolExporter.classDump.TSClassDumpParserDefinition" />
         <lang.syntaxHighlighterFactory language="TS" implementationClass="com.torquescript.highlighting.TSSyntaxHighlighterFactory" />
         <colorSettingsPage implementation="com.torquescript.TSColorSettingsPage" />
         <completion.contributor language="TS" implementationClass="com.torquescript.completion.TSCompletionContributor" />

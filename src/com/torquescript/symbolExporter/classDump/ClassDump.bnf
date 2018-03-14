@@ -1,0 +1,82 @@
+//Credit where credit is due:
+// Based on
+// CMDgram.y from Torque (a couple versions of it)
+// https://github.com/JetBrains/Grammar-Kit/blob/master/testData/generator/ExprParser.bnf
+// https://github.com/JetBrains/Grammar-Kit/blob/master/TUTORIAL.md
+{
+    parserClass="com.torquescript.symbolExporter.classDump.TSClassDumpParser"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="TSClassDump"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.torquescript.symbolExporter.classDump.psi"
+    psiImplPackage="com.torquescript.symbolExporter.classDump.psi.impl"
+
+    elementTypeHolderClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTypes"
+    elementTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpElementType"
+    tokenTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTokenType"
+}
+
+class_dump ::= (class_decl | stub_class_decl)*
+
+class_decl ::= block_comment? class_header class_inner* class_footer
+stub_class_decl ::= DOC_COMMENT class_header class_inner* class_footer
+
+private class_inner ::=
+    group
+    | method
+    | member
+
+class_header ::= CLASS identifier (COLON PUBLIC identifier)? BRACE_OPEN PUBLIC_COLON
+class_footer ::= BRACE_CLOSE SEMICOLON
+
+group ::= group_start method* group_end
+    | group_start member* group_end
+
+group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
+group_name ::= (GROUP_NAME_WORD | identifier)+
+group_end ::= GROUP_FOLD_END
+
+private method ::= engine_method | script_method
+
+engine_method ::= block_comment? VIRTUAL? type identifier PAREN_OPEN args? PAREN_CLOSE BRACE_OPEN BRACE_CLOSE
+script_method ::= block_comment type identifier args SEMICOLON
+
+args ::= PAREN_OPEN arg_list? PAREN_CLOSE ELLIPSIS
+    | PAREN_OPEN arg_list? PAREN_CLOSE
+    | ELLIPSIS
+
+arg_list ::= (arg COMMA)+ arg ELLIPSIS
+    | (arg COMMA)+ arg
+    | arg ELLIPSIS
+    | arg
+    | ELLIPSIS
+
+optional_args ::= BRACKET_OPEN arg_list? BRACKET_CLOSE
+
+arg ::= type? identifier (EQUALS value)?
+    | identifier (EQUALS value)?
+    | optional_args
+
+member ::=
+    block_comment? type identifier BRACKET_OPEN INTEGER BRACKET_CLOSE SEMICOLON
+    | block_comment? type identifier SEMICOLON
+
+value ::= STRATOM
+    | INTEGER
+    | FLOAT
+    | TRUE
+    | FALSE
+    | type PAREN_OPEN PAREN_CLOSE
+    | identifier
+
+type ::=
+    identifier '<' simple_type '>'
+    | simple_type
+
+private simple_type ::= CONST? identifier ASTERISK?
+
+private identifier ::= ID | CLASS | PUBLIC | VIRTUAL | CONST | TRUE | FALSE
+
+block_comment ::= BLOCK_START BLOCK_INNER BLOCK_END
+

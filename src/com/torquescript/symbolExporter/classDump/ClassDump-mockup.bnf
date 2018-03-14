@@ -1,0 +1,106 @@
+//Credit where credit is due:
+// Based on
+// CMDgram.y from Torque (a couple versions of it)
+// https://github.com/JetBrains/Grammar-Kit/blob/master/testData/generator/ExprParser.bnf
+// https://github.com/JetBrains/Grammar-Kit/blob/master/TUTORIAL.md
+{
+//    parserClass="com.torquescript.symbolExporter.classDump.TSClassDumpParser"
+    extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+    psiClassPrefix="TSClassDump"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.torquescript.symbolExporter.classDump.psi"
+    psiImplPackage="com.torquescript.symbolExporter.classDump.psi.impl"
+
+    elementTypeHolderClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTypes"
+    elementTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpElementType"
+    tokenTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTokenType"
+
+    tokens = [
+        INTEGER='regexp:-?[0-9]+'
+        FLOAT='regexp:(([0-9]+)\.([0-9]+))|(([0-9]+)(\.([0-9]+))?[eE][+-]?([0-9]+))|(\.([0-9]+))|((\.([0-9]+))?[eE][+-]?([0-9]+))'
+        ID='regexp:[A-Za-z_][A-Za-z0-9_]*'
+        SPACE='regexp:[ \t\v\f]'
+
+        GROUP_HEADER_START='regexp:/\*! @name'
+        GROUP_HEADER_SEPARATOR='regexp:/\*! \*/[\r\n]+'
+        GROUP_FOLD_START='regexp:@\{ \*/[\r\n]+'
+        GROUP_FOLD_END='regexp:/// @}[\r\n]+'
+        GROUP_NAME_WORD='regexp:[A-Za-z0-9_/:]*'
+
+        DOC_COMMENT='regexp:(///[^\n\r]*[\n\r]+)+'
+        COMMENT='regexp:(//[^\n\r]*[\n\r]+)+'
+
+        BLOCK_START='/*'
+        BLOCK_END='*/'
+        BLOCK_INNER='regexp:!([^*]|[\n\r])+'
+
+        //https://stackoverflow.com/a/249937/214063
+        STRATOM='regexp:"(?:[^"\\]|\\.)*"'
+        TAGATOM="regexp:'(?:[^'\\]|\\.)*'"
+    ]
+}
+
+classDump ::= (class | stub_class)*
+
+class ::= block_comment? class_header class_inner* class_footer
+stub_class ::= DOC_COMMENT class_header class_inner* class_footer
+
+private class_inner ::=
+    group
+    | method
+    | member
+
+class_header ::= 'class' ID (':' 'public' ID)? '{' 'public:' {pin=2}
+class_footer ::= '}' ';'
+
+group ::= group_start method* group_end
+    | group_start member* group_end
+
+group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
+group_name ::= (GROUP_NAME_WORD | ID)+
+group_end ::= GROUP_FOLD_END
+
+private method ::= engine_method | script_method
+
+engine_method ::= block_comment? 'virtual'? type ID '(' args? ')' '{' '}'
+script_method ::= block_comment type ID args ';'
+
+args ::= '(' arg_list? ')' '...'
+    | '(' arg_list? ')'
+    | '...'
+
+arg_list ::= (arg ',')+ arg '...'
+    | (arg ',')+ arg
+    | arg '...'
+    | arg
+    | '...'
+
+optional_args ::= '[' arg_list? ']'
+
+arg ::= type ID ('=' value)?
+    | ID ('=' value)?
+    | optional_args
+
+member ::=
+    block_comment? type ID '[' INTEGER ']' ';'
+    | block_comment? type ID ';'
+
+value ::=
+    STRATOM
+    | INTEGER
+    | FLOAT
+    | 'true'
+    | 'false'
+    | type '(' ')'
+    | ID
+
+
+type ::=
+    ID '<' simple_type '>'
+    | simple_type
+
+simple_type ::= 'const'? ID '*'?
+
+block_comment ::= BLOCK_START BLOCK_INNER BLOCK_END
+
