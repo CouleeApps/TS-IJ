@@ -44,6 +44,7 @@ script_method ::= block_comment type identifier args SEMICOLON
 
 args ::= PAREN_OPEN arg_list? PAREN_CLOSE ELLIPSIS
     | PAREN_OPEN arg_list? PAREN_CLOSE
+    | arg_list
     | ELLIPSIS
 
 arg_list ::= (arg_or_optional COMMA)+ arg_or_optional ELLIPSIS
@@ -89,7 +90,7 @@ type ::=
 
 private simple_type ::= CONST? identifier ASTERISK?
 
-private identifier ::= ID | CLASS | PUBLIC | VIRTUAL | CONST | TRUE | FALSE
+private identifier ::= ID | CLASS | PUBLIC | VIRTUAL | CONST | TRUE | FALSE | LOCALVAR | GLOBALVAR
 
 block_comment ::= BLOCK_START BLOCK_INNER BLOCK_END
 

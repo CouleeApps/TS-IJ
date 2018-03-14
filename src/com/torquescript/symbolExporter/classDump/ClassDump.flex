@@ -30,6 +30,11 @@ ID       ={LETTER}{IDTAIL}*
 SPACE    =[ \t\f]
 CRLF     =[\r\n]
 
+VARMID   =[:A-Za-z0-9_]
+VARTAIL  ={VARMID}*{IDTAIL}
+LOCALVAR ="%"{LETTER}{VARTAIL}*
+GLOBALVAR="$"{LETTER}{VARTAIL}*
+
 GROUP_HEADER_START="/*! @name "
 GROUP_HEADER_SEPARATOR="/*! */"
 GROUP_FOLD_START="@{ */"
@@ -42,12 +47,16 @@ BLOCK_START="/*"
 BLOCK_END="*/"
 BLOCK_INNER="!"([^*]|(\*[^/])|[\n\r])+
 
+//In case someone uses timestamps in the console by some sheer stroke of intelligence
+TIMESTAMP="["[\d.]+"\]"
+
 %state GROUP
 %state WAITING_VALUE
 
 %%
 
 <YYINITIAL> {
+    {TIMESTAMP}               {}
     "class"                   { return TSClassDumpTypes.CLASS; }
     "public"                  { return TSClassDumpTypes.PUBLIC; }
     "public:"                 { return TSClassDumpTypes.PUBLIC_COLON; }
@@ -71,6 +80,8 @@ BLOCK_INNER="!"([^*]|(\*[^/])|[\n\r])+
     {INTEGER}                 { return TSClassDumpTypes.INTEGER; }
     {FLOAT}                   { return TSClassDumpTypes.FLOAT; }
     {ID}                      { return TSClassDumpTypes.ID; }
+    {LOCALVAR}                { return TSClassDumpTypes.LOCALVAR; }
+    {GLOBALVAR}               { return TSClassDumpTypes.GLOBALVAR; }
     {GROUP_HEADER_START}      { yybegin(GROUP); return TSClassDumpTypes.GROUP_HEADER_START; }
     {GROUP_HEADER_SEPARATOR}  { return TSClassDumpTypes.GROUP_HEADER_SEPARATOR; }
     {GROUP_FOLD_END}          { return TSClassDumpTypes.GROUP_FOLD_END; }
