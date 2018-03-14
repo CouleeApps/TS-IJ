@@ -22,8 +22,8 @@ TAGATOM=\'([^\'\\]*(\\.[^\'\\]*)*)\'
 DIGIT    =[0-9]
 INTEGER  ="-"?{DIGIT}+
 FLOAT    =({INTEGER}\.{INTEGER})|({INTEGER}(\.{INTEGER})?[eE][+-]?{INTEGER})|(\.{INTEGER})|((\.{INTEGER})?[eE][+-]?{INTEGER})
-LETTER   =[A-Za-z_]
-IDTAIL   =[A-Za-z0-9_]
+LETTER   =[A-Za-z_:]
+IDTAIL   =[A-Za-z0-9_:]
 ID       ={LETTER}{IDTAIL}*
 SPACE    =[ \t\f]
 CRLF     =[\r\n]
@@ -31,8 +31,8 @@ CRLF     =[\r\n]
 GROUP_HEADER_START="/*! @name"
 GROUP_HEADER_SEPARATOR="/*! */"
 GROUP_FOLD_START="@{ */"
-GROUP_FOLD_END="/// @}"
-GROUP_NAME_WORD=[A-Za-z0-9_/:]*
+//GROUP_FOLD_END="/// @}"
+GROUP_NAME_WORD=[A-Za-z0-9_/:]+
 
 DOC_COMMENT=("///"[^\n\r]*[\n\r]+)+
 COMMENT=("//"[^\n\r]*[\n\r]+)+
@@ -69,15 +69,15 @@ BLOCK_INNER="!"([^*]|(\*[^/])|[\n\r])+
     {INTEGER}                 { return TSClassDumpTypes.INTEGER; }
     {FLOAT}                   { return TSClassDumpTypes.FLOAT; }
     {ID}                      { return TSClassDumpTypes.ID; }
-    {DOC_COMMENT}             { return TSClassDumpTypes.DOC_COMMENT; }
     {GROUP_HEADER_START}      { return TSClassDumpTypes.GROUP_HEADER_START; }
     {GROUP_HEADER_SEPARATOR}  { return TSClassDumpTypes.GROUP_HEADER_SEPARATOR; }
     {GROUP_FOLD_START}        { return TSClassDumpTypes.GROUP_FOLD_START; }
-    {GROUP_FOLD_END}          { return TSClassDumpTypes.GROUP_FOLD_END; }
+//    {GROUP_FOLD_END}          { return TSClassDumpTypes.GROUP_FOLD_END; }
     {GROUP_NAME_WORD}         { return TSClassDumpTypes.GROUP_NAME_WORD; }
     {BLOCK_START}             { return TSClassDumpTypes.BLOCK_START; }
     {BLOCK_END}               { return TSClassDumpTypes.BLOCK_END; }
     {BLOCK_INNER}             { return TSClassDumpTypes.BLOCK_INNER; }
+    {DOC_COMMENT}             { return TSClassDumpTypes.DOC_COMMENT; }
     {STRATOM}                 { return TSClassDumpTypes.STRATOM; }
 }
 ({SPACE}|{CRLF})+                                   { return TokenType.WHITE_SPACE; }

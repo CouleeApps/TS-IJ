@@ -19,14 +19,14 @@
     tokens = [
         INTEGER='regexp:-?[0-9]+'
         FLOAT='regexp:(([0-9]+)\.([0-9]+))|(([0-9]+)(\.([0-9]+))?[eE][+-]?([0-9]+))|(\.([0-9]+))|((\.([0-9]+))?[eE][+-]?([0-9]+))'
-        ID='regexp:[A-Za-z_][A-Za-z0-9_]*'
+        ID='regexp:[A-Za-z_:][A-Za-z0-9_:]*'
         SPACE='regexp:[ \t\v\f]'
 
         GROUP_HEADER_START='regexp:/\*! @name'
         GROUP_HEADER_SEPARATOR='regexp:/\*! \*/[\r\n]+'
         GROUP_FOLD_START='regexp:@\{ \*/[\r\n]+'
         GROUP_FOLD_END='regexp:/// @}[\r\n]+'
-        GROUP_NAME_WORD='regexp:[A-Za-z0-9_/:]*'
+        GROUP_NAME_WORD='regexp:[A-Za-z0-9_/:]+'
 
         DOC_COMMENT='regexp:(///[^\n\r]*[\n\r]+)+'
         COMMENT='regexp:(//[^\n\r]*[\n\r]+)+'
@@ -92,9 +92,14 @@ value ::=
     | FLOAT
     | 'true'
     | 'false'
-    | type '(' ')'
+    | type '(' value_list? ')'
     | ID
 
+value_list ::= (value ',')+ value '...'
+    | (value ',')+ value
+    | value '...'
+    | value
+    | '...'
 
 type ::=
     ID '<' simple_type '>'

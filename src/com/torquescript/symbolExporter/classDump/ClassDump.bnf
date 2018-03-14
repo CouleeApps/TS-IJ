@@ -35,7 +35,7 @@ group ::= group_start method* group_end
 
 group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
 group_name ::= (GROUP_NAME_WORD | identifier)+
-group_end ::= GROUP_FOLD_END
+group_end ::= DOC_COMMENT
 
 private method ::= engine_method | script_method
 
@@ -67,8 +67,14 @@ value ::= STRATOM
     | FLOAT
     | TRUE
     | FALSE
-    | type PAREN_OPEN PAREN_CLOSE
+    | type PAREN_OPEN value_list? PAREN_CLOSE
     | identifier
+
+value_list ::= (value COMMA)+ value ELLIPSIS
+    | (value COMMA)+ value
+    | value ELLIPSIS
+    | value
+    | ELLIPSIS
 
 type ::=
     identifier '<' simple_type '>'
