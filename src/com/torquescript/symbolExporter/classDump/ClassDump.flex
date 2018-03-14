@@ -20,19 +20,20 @@ STRATOM=\"([^\"\\]*(\\.[^\"\\]*)*)\"
 TAGATOM=\'([^\'\\]*(\\.[^\'\\]*)*)\'
 
 DIGIT    =[0-9]
-INTEGER  ="-"?{DIGIT}+
-FLOAT    =({INTEGER}\.{INTEGER})|({INTEGER}(\.{INTEGER})?[eE][+-]?{INTEGER})|(\.{INTEGER})|((\.{INTEGER})?[eE][+-]?{INTEGER})
+DECIMAL  ={DIGIT}+
+HEX      ="0x"[0-9A-Fa-f]+
+INTEGER  ="-"?({DECIMAL}|{HEX})
+FLOAT    =({INTEGER}\.{INTEGER}"f")|({INTEGER}\.{INTEGER})|({INTEGER}(\.{INTEGER})?[eE][+-]?{INTEGER})|(\.{INTEGER})|((\.{INTEGER})?[eE][+-]?{INTEGER})
 LETTER   =[A-Za-z_:]
 IDTAIL   =[A-Za-z0-9_:]
 ID       ={LETTER}{IDTAIL}*
 SPACE    =[ \t\f]
 CRLF     =[\r\n]
 
-GROUP_HEADER_START="/*! @name"
+GROUP_HEADER_START="/*! @name "
 GROUP_HEADER_SEPARATOR="/*! */"
 GROUP_FOLD_START="@{ */"
-//GROUP_FOLD_END="/// @}"
-GROUP_NAME_WORD=[A-Za-z0-9_/:]+
+GROUP_FOLD_END="/// @}"
 
 DOC_COMMENT=("///"[^\n\r]*[\n\r]+)+
 COMMENT=("//"[^\n\r]*[\n\r]+)+
@@ -41,6 +42,7 @@ BLOCK_START="/*"
 BLOCK_END="*/"
 BLOCK_INNER="!"([^*]|(\*[^/])|[\n\r])+
 
+%state GROUP
 %state WAITING_VALUE
 
 %%
@@ -69,16 +71,18 @@ BLOCK_INNER="!"([^*]|(\*[^/])|[\n\r])+
     {INTEGER}                 { return TSClassDumpTypes.INTEGER; }
     {FLOAT}                   { return TSClassDumpTypes.FLOAT; }
     {ID}                      { return TSClassDumpTypes.ID; }
-    {GROUP_HEADER_START}      { return TSClassDumpTypes.GROUP_HEADER_START; }
+    {GROUP_HEADER_START}      { yybegin(GROUP); return TSClassDumpTypes.GROUP_HEADER_START; }
     {GROUP_HEADER_SEPARATOR}  { return TSClassDumpTypes.GROUP_HEADER_SEPARATOR; }
-    {GROUP_FOLD_START}        { return TSClassDumpTypes.GROUP_FOLD_START; }
-//    {GROUP_FOLD_END}          { return TSClassDumpTypes.GROUP_FOLD_END; }
-    {GROUP_NAME_WORD}         { return TSClassDumpTypes.GROUP_NAME_WORD; }
+    {GROUP_FOLD_END}          { return TSClassDumpTypes.GROUP_FOLD_END; }
     {BLOCK_START}             { return TSClassDumpTypes.BLOCK_START; }
     {BLOCK_END}               { return TSClassDumpTypes.BLOCK_END; }
     {BLOCK_INNER}             { return TSClassDumpTypes.BLOCK_INNER; }
     {DOC_COMMENT}             { return TSClassDumpTypes.DOC_COMMENT; }
     {STRATOM}                 { return TSClassDumpTypes.STRATOM; }
+}
+<GROUP> {
+    {GROUP_FOLD_START}        { yybegin(YYINITIAL); return TSClassDumpTypes.GROUP_FOLD_START; }
+    .+                        { return TSClassDumpTypes.ID; }
 }
 ({SPACE}|{CRLF})+                                   { return TokenType.WHITE_SPACE; }
 .                                                   { return TokenType.BAD_CHARACTER; }

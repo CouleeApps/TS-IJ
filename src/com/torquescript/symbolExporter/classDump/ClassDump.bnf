@@ -35,7 +35,7 @@ group ::= group_start method* group_end
 
 group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
 group_name ::= (GROUP_NAME_WORD | identifier)+
-group_end ::= DOC_COMMENT
+group_end ::= (DOC_COMMENT | GROUP_FOLD_END)
 
 private method ::= engine_method | script_method
 
@@ -46,29 +46,36 @@ args ::= PAREN_OPEN arg_list? PAREN_CLOSE ELLIPSIS
     | PAREN_OPEN arg_list? PAREN_CLOSE
     | ELLIPSIS
 
-arg_list ::= (arg COMMA)+ arg ELLIPSIS
-    | (arg COMMA)+ arg
-    | arg ELLIPSIS
-    | arg
-    | ELLIPSIS
-
-optional_args ::= BRACKET_OPEN arg_list? BRACKET_CLOSE
-
-arg ::= type? identifier (EQUALS value)?
-    | identifier (EQUALS value)?
+arg_list ::= (arg_or_optional COMMA)+ arg_or_optional ELLIPSIS
+    | (arg_or_optional COMMA)+ arg_or_optional
+    | arg_or_optional ELLIPSIS
+    | arg_or_optional
     | optional_args
+
+optional_args ::= BRACKET_OPEN COMMA arg_list? BRACKET_CLOSE
+    | BRACKET_OPEN arg_list? BRACKET_CLOSE
+
+arg_or_optional ::= arg COMMA optional_args
+    | arg optional_args
+    | arg
+
+arg ::= type identifier (EQUALS value)?
+    | identifier (EQUALS value)?
+    | ELLIPSIS
 
 member ::=
     block_comment? type identifier BRACKET_OPEN INTEGER BRACKET_CLOSE SEMICOLON
     | block_comment? type identifier SEMICOLON
 
-value ::= STRATOM
+value ::=
+    STRATOM
     | INTEGER
     | FLOAT
     | TRUE
     | FALSE
     | type PAREN_OPEN value_list? PAREN_CLOSE
     | identifier
+    | PAREN_OPEN type PAREN_CLOSE value
 
 value_list ::= (value COMMA)+ value ELLIPSIS
     | (value COMMA)+ value

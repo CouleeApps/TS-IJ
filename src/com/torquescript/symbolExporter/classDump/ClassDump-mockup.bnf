@@ -26,7 +26,7 @@
         GROUP_HEADER_SEPARATOR='regexp:/\*! \*/[\r\n]+'
         GROUP_FOLD_START='regexp:@\{ \*/[\r\n]+'
         GROUP_FOLD_END='regexp:/// @}[\r\n]+'
-        GROUP_NAME_WORD='regexp:[A-Za-z0-9_/:]+'
+        GROUP_NAME_WORD='regexp:[A-Za-z0-9_/:.]+'
 
         DOC_COMMENT='regexp:(///[^\n\r]*[\n\r]+)+'
         COMMENT='regexp:(//[^\n\r]*[\n\r]+)+'
