@@ -7,39 +7,64 @@
     parserClass="com.torquescript.symbolExporter.classDump.TSClassDumpParser"
     extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
+    extends(".*_group")='group'
+
     psiClassPrefix="TSClassDump"
     psiImplClassSuffix="Impl"
     psiPackage="com.torquescript.symbolExporter.classDump.psi"
     psiImplPackage="com.torquescript.symbolExporter.classDump.psi.impl"
+
+    psiImplUtilClass="com.torquescript.symbolExporter.classDump.psi.impl.TSClassDumpPsiImplUtil"
 
     elementTypeHolderClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTypes"
     elementTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpElementType"
     tokenTypeClass="com.torquescript.symbolExporter.classDump.psi.TSClassDumpTokenType"
 }
 
-class_dump ::= (class_decl | stub_class_decl)*
+class_dump ::= (class_decl | stub_class_decl)+
+    | namespace_decl
+    |
 
 class_decl ::= block_comment? class_header class_inner* class_footer
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
+     methods=[getName setName getNameIdentifier getPresentation]}
 stub_class_decl ::= DOC_COMMENT class_header class_inner* class_footer
+namespace_decl ::= namespace_header namespace_inner*
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
+     methods=[getName setName getNameIdentifier getPresentation]}
 
 private class_inner ::=
     group
     | method
     | member
 
-class_header ::= CLASS identifier (COLON PUBLIC identifier)? BRACE_OPEN PUBLIC_COLON
-class_footer ::= BRACE_CLOSE SEMICOLON
+private namespace_inner ::=
+    stupid_group namespace_footer
+    | group
+    | method
+
+private class_header ::= CLASS identifier (COLON PUBLIC identifier)? BRACE_OPEN PUBLIC_COLON
+private class_footer ::= BRACE_CLOSE SEMICOLON
+
+private namespace_header ::= NAMESPACE ID BRACE_OPEN
+private namespace_footer ::= BRACE_CLOSE SEMICOLON
 
 group ::= group_start method* group_end
     | group_start member* group_end
 
-group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
-group_name ::= (GROUP_NAME_WORD | identifier)+
-group_end ::= (DOC_COMMENT | GROUP_FOLD_END)
+stupid_group ::= group_start method*
+    | group_start member*
+
+private group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
+private group_name ::= (GROUP_NAME_WORD | identifier)+
+private group_end ::= (DOC_COMMENT | GROUP_FOLD_END)
 
 private method ::= engine_method | script_method
 
 engine_method ::= block_comment? VIRTUAL? type identifier PAREN_OPEN args? PAREN_CLOSE BRACE_OPEN BRACE_CLOSE
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
+     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace getFunctionType getArgList]}
+
 script_method ::= block_comment type identifier args SEMICOLON
 
 args ::= PAREN_OPEN arg_list? PAREN_CLOSE ELLIPSIS
@@ -56,12 +81,12 @@ arg_list ::= (arg_or_optional COMMA)+ arg_or_optional ELLIPSIS
 optional_args ::= BRACKET_OPEN COMMA arg_list? BRACKET_CLOSE
     | BRACKET_OPEN arg_list? BRACKET_CLOSE
 
-arg_or_optional ::= arg COMMA optional_args
+private arg_or_optional ::= arg COMMA optional_args
     | arg optional_args
     | arg
 
 arg ::= type identifier (EQUALS value)?
-    | identifier (EQUALS value)?
+    | type (EQUALS value)?
     | ELLIPSIS
 
 member ::=
@@ -75,6 +100,7 @@ value ::=
     | TRUE
     | FALSE
     | type PAREN_OPEN value_list? PAREN_CLOSE
+    | (identifier PIPE)+ identifier
     | identifier
     | PAREN_OPEN type PAREN_CLOSE value
 
@@ -85,12 +111,14 @@ value_list ::= (value COMMA)+ value ELLIPSIS
     | ELLIPSIS
 
 type ::=
-    identifier '<' simple_type '>'
+    identifier ANGLE_OPEN simple_type ANGLE_CLOSE
+    | (identifier PIPE)+ identifier
     | simple_type
 
-private simple_type ::= CONST? identifier ASTERISK?
+private simple_type ::= CONST? type_qualifier* identifier ASTERISK?
+private type_qualifier ::= UNSIGNED | SIGNED | LONG | SHORT
 
-private identifier ::= ID | CLASS | PUBLIC | VIRTUAL | CONST | TRUE | FALSE | LOCALVAR | GLOBALVAR
+identifier ::= ID | CLASS | PUBLIC | VIRTUAL | CONST | TRUE | FALSE | NAMESPACE | UNSIGNED | SIGNED | LONG | SHORT | LOCALVAR | GLOBALVAR
 
 block_comment ::= BLOCK_START BLOCK_INNER BLOCK_END
 

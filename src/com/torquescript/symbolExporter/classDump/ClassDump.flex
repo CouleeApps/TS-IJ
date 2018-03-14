@@ -64,6 +64,11 @@ TIMESTAMP="["[\d.]+"\]"
     "const"                   { return TSClassDumpTypes.CONST; }
     "true"                    { return TSClassDumpTypes.TRUE; }
     "false"                   { return TSClassDumpTypes.FALSE; }
+    "namespace"               { return TSClassDumpTypes.NAMESPACE; }
+    "unsigned"                { return TSClassDumpTypes.UNSIGNED; }
+    "signed"                  { return TSClassDumpTypes.SIGNED; }
+    "long"                    { return TSClassDumpTypes.LONG; }
+    "short"                   { return TSClassDumpTypes.SHORT; }
     ":"                       { return TSClassDumpTypes.COLON; }
     ";"                       { return TSClassDumpTypes.SEMICOLON; }
     ","                       { return TSClassDumpTypes.COMMA; }
@@ -75,6 +80,9 @@ TIMESTAMP="["[\d.]+"\]"
     "]"                       { return TSClassDumpTypes.BRACKET_CLOSE; }
     "{"                       { return TSClassDumpTypes.BRACE_OPEN; }
     "}"                       { return TSClassDumpTypes.BRACE_CLOSE; }
+    "<"                       { return TSClassDumpTypes.ANGLE_OPEN; }
+    ">"                       { return TSClassDumpTypes.ANGLE_CLOSE; }
+    "|"                       { return TSClassDumpTypes.PIPE; }
     "..."                     { return TSClassDumpTypes.ELLIPSIS; }
 
     {INTEGER}                 { return TSClassDumpTypes.INTEGER; }

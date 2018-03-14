@@ -4,15 +4,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.torquescript.psi.*;
-import com.torquescript.symbols.TSFunctionCachedListGenerator;
-import com.torquescript.symbols.TSGlobalCachedListGenerator;
-import com.torquescript.symbols.TSObjectCachedListGenerator;
-import com.torquescript.symbols.TSCachedList;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpEngineMethod;
+import com.torquescript.symbols.*;
 
 import java.util.*;
 
 public class TSUtil {
     private static TSCachedList<TSFnDeclStmt> FUNCTIONS = new TSCachedList<>(new TSFunctionCachedListGenerator());
+    private static TSCachedList<TSClassDumpEngineMethod> ENGINE_METHODS = new TSCachedList<>(new TSEngineMethodCachedListGenerator());
     private static TSCachedList<TSVarExpr> GLOBALS = new TSCachedList<>(new TSGlobalCachedListGenerator());
     private static TSCachedList<TSObjectExpr> OBJECTS = new TSCachedList<>(new TSObjectCachedListGenerator());
 
@@ -40,6 +39,35 @@ public class TSUtil {
                     result = new ArrayList<>();
                 }
                 result.add(function);
+            }
+        }
+        return result == null ? Collections.emptyList() : result;
+    }
+
+    /**
+     * Find all engine function in the project.
+     * @param project Containing project in which to search
+     * @return A list of functions
+     */
+    public static List<TSClassDumpEngineMethod> getEngineMethodList(Project project) {
+        return new ArrayList<>(ENGINE_METHODS.getList(project));
+    }
+
+    /**
+     * Find an engine function in the project matching a given string.
+     * @param project Containing project in which to search
+     * @param key Search string compare functions with
+     * @return A function declaration, or null if none is found
+     */
+    public static List<TSClassDumpEngineMethod> findEngineMethod(Project project, String key) {
+        List<TSClassDumpEngineMethod> result = null;
+        Collection<TSClassDumpEngineMethod> methods = new ArrayList<>(ENGINE_METHODS.getList(project));
+        for (TSClassDumpEngineMethod method : methods) {
+            if (key.equalsIgnoreCase(method.getFunctionName())) {
+                if (result == null) {
+                    result = new ArrayList<>();
+                }
+                result.add(method);
             }
         }
         return result == null ? Collections.emptyList() : result;

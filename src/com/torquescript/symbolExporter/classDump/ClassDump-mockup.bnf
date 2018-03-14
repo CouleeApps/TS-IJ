@@ -57,9 +57,9 @@ class_footer ::= '}' ';'
 group ::= group_start method* group_end
     | group_start member* group_end
 
-group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
-group_name ::= (GROUP_NAME_WORD | ID)+
-group_end ::= GROUP_FOLD_END
+private group_start ::= GROUP_HEADER_START group_name GROUP_FOLD_START GROUP_HEADER_SEPARATOR
+private group_name ::= (GROUP_NAME_WORD | ID)+
+private group_end ::= GROUP_FOLD_END
 
 private method ::= engine_method | script_method
 
@@ -105,7 +105,7 @@ type ::=
     ID '<' simple_type '>'
     | simple_type
 
-simple_type ::= 'const'? ID '*'?
+private simple_type ::= 'const'? ID '*'?
 
 block_comment ::= BLOCK_START BLOCK_INNER BLOCK_END
 

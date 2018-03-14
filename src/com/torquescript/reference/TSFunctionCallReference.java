@@ -3,14 +3,13 @@ package com.torquescript.reference;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSIcons;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSCallExpr;
 import com.torquescript.psi.TSFnDeclStmt;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpEngineMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,12 +33,18 @@ public class TSFunctionCallReference extends PsiReferenceBase<PsiElement> implem
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
         Project project = myElement.getProject();
-        final List<TSFnDeclStmt> functions = TSUtil.findFunction(project, name);
         List<ResolveResult> results = new ArrayList<>();
+        final List<TSFnDeclStmt> functions = TSUtil.findFunction(project, name);
         for (TSFnDeclStmt function : functions) {
             //Because you can GLOBAL_NS call a METHOD but not a GLOBAL unless parent
             if ((function.getFunctionType() == TSFunctionType.GLOBAL) == (type == TSFunctionType.GLOBAL)) {
                 results.add(new PsiElementResolveResult(function));
+            }
+        }
+        final List<TSClassDumpEngineMethod> engineMethods = TSUtil.findEngineMethod(project, name);
+        for (TSClassDumpEngineMethod method : engineMethods) {
+            if ((method.getFunctionType() == TSFunctionType.GLOBAL) == (type == TSFunctionType.GLOBAL)) {
+                results.add(new PsiElementResolveResult(method));
             }
         }
         return results.toArray(new ResolveResult[results.size()]);
@@ -56,14 +61,25 @@ public class TSFunctionCallReference extends PsiReferenceBase<PsiElement> implem
     @Override
     public Object[] getVariants() {
         Project project = myElement.getProject();
-        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         List<LookupElement> variants = new ArrayList<>();
 
+        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         for (final TSFnDeclStmt function : functions) {
             if (function.getFunctionName() != null && function.getFunctionName().length() > 0) {
                 variants.add(LookupElementBuilder.create(function)
                         .withIcon(TSIcons.FILE)
                         .withTypeText(function.getContainingFile().getName())
+                        .withCaseSensitivity(false)
+
+                );
+            }
+        }
+        Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
+        for (final TSClassDumpEngineMethod method : engineMethods) {
+            if (method.getFunctionName() != null && method.getFunctionName().length() > 0) {
+                variants.add(LookupElementBuilder.create(method)
+                        .withIcon(TSIcons.FILE)
+                        .withTypeText(method.getContainingFile().getName())
                         .withCaseSensitivity(false)
 
                 );

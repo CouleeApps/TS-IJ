@@ -31,6 +31,7 @@ import java.util.HashMap;
 public class TSSymbolExporter {
     private static HashMap<Project, TSSymbolExporter> EXPORTERS = new HashMap<>();
 
+    @NotNull
     public static TSSymbolExporter getExporter(TSRunConfiguration runConfiguration) {
         if (EXPORTERS.containsKey(runConfiguration.getProject())) {
             return EXPORTERS.get(runConfiguration.getProject());
@@ -42,11 +43,19 @@ public class TSSymbolExporter {
         return exporter;
     }
 
+    public static TSSymbolExporter getExporter(Project project) {
+        if (EXPORTERS.containsKey(project)) {
+            return EXPORTERS.get(project);
+        }
+        return null;
+    }
+
     private TSRunConfiguration runConfiguration;
     private boolean dirty = true;
     private boolean running = false;
     private static final String LOCK = "Probably slow";
-    private static String exportedConsole = null;
+    private TSClassDumpFile globalClasses;
+    private TSClassDumpFile globalFunctions;
 
     private TSSymbolExporter(TSRunConfiguration runConfiguration) {
         this.runConfiguration = runConfiguration;
@@ -58,7 +67,7 @@ public class TSSymbolExporter {
         }
     }
 
-    protected void updateFinished(boolean successful) {
+    private void updateFinished(boolean successful) {
         synchronized (LOCK) {
             running = false;
             dirty = !successful;
@@ -75,7 +84,7 @@ public class TSSymbolExporter {
         }
     }
 
-    protected void generateSymbolList() {
+    private void generateSymbolList() {
         ProgressManager.getInstance().run(new Task.Modal(runConfiguration.getProject(), "Generate Symbol List", false) {
             public void run(@NotNull ProgressIndicator indicator) {
                 indicator.setIndeterminate(true);
@@ -132,12 +141,12 @@ public class TSSymbolExporter {
         });
     }
 
-    protected boolean extractSymbols(byte[] contents, ProgressIndicator indicator) {
+    private boolean extractSymbols(byte[] contents, ProgressIndicator indicator) {
         indicator.setIndeterminate(false);
         indicator.setFraction(0);
         indicator.setText2("Extracting dumped symbols...");
 
-        exportedConsole = new String(contents);
+        String exportedConsole = new String(contents);
         String[] parts = exportedConsole.split(TSSymbolExporterCommandLineState.BOUNDARY);
 
         if (parts.length != 4) {
@@ -148,14 +157,23 @@ public class TSSymbolExporter {
         String consoleClassesText = parts[1];
         String consoleFunctionsText = parts[2];
 
-        TSClassDumpFile file = createFile(runConfiguration.getProject(), consoleClassesText);
-
+        globalClasses = createFile(runConfiguration.getProject(), consoleClassesText);
+        indicator.setFraction(0.5);
+        globalFunctions = createFile(runConfiguration.getProject(), consoleFunctionsText);
         indicator.setFraction(1);
         return true;
     }
 
+    public TSClassDumpFile getGlobalClasses() {
+        return globalClasses;
+    }
+
+    public TSClassDumpFile getGlobalFunctions() {
+        return globalFunctions;
+    }
+
     @NotNull
-    public static TSClassDumpFile createFile(Project project, String text) {
+    private static TSClassDumpFile createFile(Project project, String text) {
         String fileName = "dummy.tscd";
         return (TSClassDumpFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, TSClassDumpFileType.INSTANCE, text);
     }

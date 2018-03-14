@@ -9,6 +9,7 @@ import com.intellij.util.ProcessingContext;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSFnDeclStmt;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpEngineMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -27,6 +28,17 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
                     LookupElementBuilder.create(function)
                             .withCaseSensitivity(false)
                             .withTailText(function.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
+            );
+        }
+        Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
+        for (TSClassDumpEngineMethod method : engineMethods) {
+            if (method.getFunctionType() != TSFunctionType.GLOBAL)
+                continue;
+            result.addElement(
+                    LookupElementBuilder.create(method)
+                            .withCaseSensitivity(false)
+                            .withTailText(method.getArgList())
                             .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }

@@ -27,7 +27,9 @@ public class TSChooseByNameContributor implements ChooseByNameContributor {
     @NotNull
     @Override
     public NavigationItem[] getItemsByName(String name, String pattern, Project project, boolean includeNonProjectItems) {
-        List<TSFnDeclStmt> functions = TSUtil.findFunction(project, name);
-        return functions.toArray(new NavigationItem[functions.size()]);
+        List<NavigationItem> navs = new ArrayList<>();
+        navs.addAll(TSUtil.findFunction(project, name));
+        navs.addAll(TSUtil.findEngineMethod(project, name));
+        return navs.toArray(new NavigationItem[navs.size()]);
     }
 }
