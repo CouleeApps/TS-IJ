@@ -32,13 +32,15 @@ ID       ={LETTER}{IDTAIL}*
 SPACE    =[ \t\f]
 CRLF     =[\r\n]
 COMMENT  ="//"[^\r\n]*
+BLOCK_COMMENT = (\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/.*)
 
 %state WAITING_VALUE
 
 %%
 
 <YYINITIAL> {
-    {COMMENT}                                       { yybegin(YYINITIAL); return TSTypes.COMMENT; }
+    {COMMENT}                                       { return TSTypes.COMMENT; }
+    {BLOCK_COMMENT}                                 { return TSTypes.COMMENT; }
 
     "function"                                      { return TSTypes.FUNCTION; }
     "package"                                       { return TSTypes.PACKAGE; }
@@ -123,5 +125,6 @@ COMMENT  ="//"[^\r\n]*
     {STRATOM}                                       { return TSTypes.STRATOM; }
     {TAGATOM}                                       { return TSTypes.TAGATOM; }
 }
+
 ({SPACE}|{CRLF})+                                   { return TokenType.WHITE_SPACE; }
 .                                                   { return TokenType.BAD_CHARACTER; }
