@@ -57,6 +57,12 @@ BLOCK_COMMENT = (\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/.*)
     "continue"                                      { return TSTypes.CONTINUE; }
     "return"                                        { return TSTypes.RETURN; }
     "datablock"                                     { return TSTypes.DATABLOCK; }
+    "in"                                            { return TSTypes.IN; }
+    "do"                                            { return TSTypes.DO; }
+    "foreach"                                       { return TSTypes.FOREACH; }
+    "foreach$"                                      { return TSTypes.FOREACHSTR; }
+    //Unused in T3D as of 2018-03
+//    "namespace"                                     { return TSTypes.NAMESPACE; }
     "new"                                           { return TSTypes.NEW; }
     "true"                                          { return TSTypes.TRUE; }
     "false"                                         { return TSTypes.FALSE; }
@@ -73,6 +79,8 @@ BLOCK_COMMENT = (\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/.*)
     "," { return TSTypes.COMMA; }
     "." { return TSTypes.DOT; }
     "::" { return TSTypes.COLON_DOUBLE; }
+    "-->" { return TSTypes.POINT_INTERNAL_RECURSIVE; }
+    "->" { return TSTypes.POINT_INTERNAL; }
 
     "=" { return TSTypes.ASSIGN; }
     "++" { return TSTypes.ASSIGN_INC; }

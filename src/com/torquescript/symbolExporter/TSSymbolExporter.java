@@ -17,6 +17,7 @@ import com.intellij.openapi.progress.Task;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFileFactory;
+import com.torquescript.TSUtil;
 import com.torquescript.runner.TSRunConfiguration;
 import com.torquescript.symbolExporter.classDump.TSClassDumpFile;
 import com.torquescript.symbolExporter.classDump.TSClassDumpFileType;
@@ -161,6 +162,10 @@ public class TSSymbolExporter {
         indicator.setFraction(0.5);
         globalFunctions = createFile(runConfiguration.getProject(), consoleFunctionsText);
         indicator.setFraction(1);
+
+        //Update this immediately
+        TSUtil.getEngineMethodList(runConfiguration.getProject());
+
         return true;
     }
 

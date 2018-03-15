@@ -18,23 +18,7 @@ public class TSMethodCallCompletionContributor extends CompletionProvider<Comple
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
         PsiElement caller = parameters.getPosition().getPrevSibling().getPrevSibling();
         String ns = TSUtil.getElementNamespace(caller);
-
-        //All global functions
         Project project = parameters.getOriginalFile().getProject();
-        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
-        for (TSFnDeclStmt function : functions) {
-            if (function.getFunctionType() == TSFunctionType.GLOBAL)
-                continue;
-
-            result.addElement(
-                    LookupElementBuilder.create(function.getFunctionName())
-                            .withCaseSensitivity(false)
-                            .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
-                            .withBoldness(ns != null && function.getNamespace().equalsIgnoreCase(ns))
-                            .withTailText(function.getArgList())
-                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
-            );
-        }
 
         Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
         for (TSClassDumpEngineMethod method : engineMethods) {
@@ -47,6 +31,21 @@ public class TSMethodCallCompletionContributor extends CompletionProvider<Comple
                             .withPresentableText(method.getNamespace() + "." + method.getFunctionName())
                             .withBoldness(ns != null && method.getNamespace().equalsIgnoreCase(ns))
                             .withTailText(method.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
+            );
+        }
+
+        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
+        for (TSFnDeclStmt function : functions) {
+            if (function.getFunctionType() == TSFunctionType.GLOBAL)
+                continue;
+
+            result.addElement(
+                    LookupElementBuilder.create(function.getFunctionName())
+                            .withCaseSensitivity(false)
+                            .withPresentableText(function.getNamespace() + "." + function.getFunctionName())
+                            .withBoldness(ns != null && function.getNamespace().equalsIgnoreCase(ns))
+                            .withTailText(function.getArgList())
                             .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }

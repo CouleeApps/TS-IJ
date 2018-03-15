@@ -60,6 +60,8 @@ private stmt ::=
     |
     for_stmt
     |
+    foreach_stmt
+    |
     datablock_decl
     |
     switch_stmt
@@ -85,11 +87,30 @@ if_stmt ::=
 
 while_stmt ::=
     WHILE PAREN_OPEN expr PAREN_CLOSE stmt_block
-    //Do-while not in MBTS
+    |
+    DO stmt_block WHILE PAREN_OPEN expr PAREN_CLOSE
 
 for_stmt ::=
     FOR PAREN_OPEN expr SEMICOLON expr SEMICOLON expr PAREN_CLOSE stmt_block
-    //Partial for not in MBTS
+    |
+    FOR PAREN_OPEN expr SEMICOLON expr SEMICOLON      PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN expr SEMICOLON      SEMICOLON expr PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN expr SEMICOLON      SEMICOLON      PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN      SEMICOLON expr SEMICOLON expr PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN      SEMICOLON expr SEMICOLON      PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN      SEMICOLON      SEMICOLON expr PAREN_CLOSE stmt_block
+    |
+    FOR PAREN_OPEN      SEMICOLON      SEMICOLON      PAREN_CLOSE stmt_block
+
+foreach_stmt ::=
+    FOREACH PAREN_OPEN var_group IN expr PAREN_CLOSE stmt_block
+    |
+    FOREACHSTR PAREN_OPEN var_group IN expr PAREN_CLOSE stmt_block
 
 datablock_decl ::=
     DATABLOCK ID PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
@@ -180,6 +201,10 @@ object_expr ::=
     NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
     |
     NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE
+    |
+    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
+    |
+    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE
     {methods=[getName getClassName getParentName]}
 
 class_name_expr ::=
@@ -243,8 +268,8 @@ private pissy_group ::=
 fake assign_expr ::=
 assign_var_expr ::= var_group assign_block {rightAssociative=true extends=assign_expr}
 assign_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
-assign_ref_expr ::= expr DOT ID assign_block {rightAssociative=true extends=assign_expr}
-assign_ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
+assign_ref_expr ::= expr indirection ID assign_block {rightAssociative=true extends=assign_expr}
+assign_ref_index_expr ::= expr indirection ID BRACKET_OPEN array_index_expr BRACKET_CLOSE assign_block {rightAssociative=true extends=assign_expr}
 
 private assign_block ::=
     ASSIGN expr
@@ -257,12 +282,12 @@ private assign_block ::=
 fake call_expr ::= {methods=[getReference getFunctionName getNameNode getFunctionType isParentCall getParentFunction]}
 call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_method_expr ::= expr DOT ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_method_expr ::= expr indirection ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
 
 //Access group
 ref_var_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE
-ref_index_expr ::= expr DOT ID BRACKET_OPEN array_index_expr BRACKET_CLOSE
-ref_expr ::= expr DOT ID
+ref_index_expr ::= expr indirection ID BRACKET_OPEN array_index_expr BRACKET_CLOSE
+ref_expr ::= expr indirection ID
 //Primary group
 literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | var_group | bool_expr | ID {methods=[getName getReference]}
 paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
@@ -270,6 +295,7 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 //-----------------------------------------------------------------------------
 //Helpers
 
+private indirection ::= DOT | POINT_INTERNAL | POINT_INTERNAL_RECURSIVE
 private array_index_expr ::= expr (COMMA expr)*
 private arg_list ::= expr (COMMA expr)*
 bool_expr ::= TRUE | FALSE

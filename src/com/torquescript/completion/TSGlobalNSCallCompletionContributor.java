@@ -14,6 +14,7 @@ import com.torquescript.TSFileType;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSUtil;
 import com.torquescript.psi.TSFnDeclStmt;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpEngineMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -24,8 +25,23 @@ public class TSGlobalNSCallCompletionContributor extends CompletionProvider<Comp
         String namespace = parameters.getPosition().getPrevSibling().getPrevSibling().getText();
 
         Project project = parameters.getOriginalFile().getProject();
-        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
 
+        Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
+        for (TSClassDumpEngineMethod method : engineMethods) {
+            if (method.getFunctionType() == TSFunctionType.GLOBAL)
+                continue;
+            if (namespace != null && !method.getNamespace().equalsIgnoreCase(namespace))
+                continue;
+            result.addElement(
+                    LookupElementBuilder.create(method.getFunctionName())
+                            .withCaseSensitivity(false)
+                            .withPresentableText(method.getNamespace() + "::" + method.getFunctionName())
+                            .withTailText(method.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
+            );
+        }
+
+        Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         for (TSFnDeclStmt function : functions) {
             if (function.getFunctionType() == TSFunctionType.GLOBAL)
                 continue;

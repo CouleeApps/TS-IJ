@@ -65,6 +65,7 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
         KEYS.put(TSTypes.CONTINUE, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.RETURN, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.DATABLOCK, new TextAttributesKey[]{KEYWORD});
+        KEYS.put(TSTypes.SINGLETON, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.NEW, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.TRUE, new TextAttributesKey[]{KEYWORD});
         KEYS.put(TSTypes.FALSE, new TextAttributesKey[]{KEYWORD});

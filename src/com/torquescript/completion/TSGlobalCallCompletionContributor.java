@@ -19,6 +19,17 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
     protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
         //All global functions
         Project project = parameters.getOriginalFile().getProject();
+        Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
+        for (TSClassDumpEngineMethod method : engineMethods) {
+            if (method.getFunctionType() != TSFunctionType.GLOBAL)
+                continue;
+            result.addElement(
+                    LookupElementBuilder.create(method)
+                            .withCaseSensitivity(false)
+                            .withTailText(method.getArgList())
+                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
+            );
+        }
         Collection<TSFnDeclStmt> functions = TSUtil.getFunctionList(project);
         for (TSFnDeclStmt function : functions) {
             if (function.getFunctionType() != TSFunctionType.GLOBAL)
@@ -28,17 +39,6 @@ public class TSGlobalCallCompletionContributor extends CompletionProvider<Comple
                     LookupElementBuilder.create(function)
                             .withCaseSensitivity(false)
                             .withTailText(function.getArgList())
-                            .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
-            );
-        }
-        Collection<TSClassDumpEngineMethod> engineMethods = TSUtil.getEngineMethodList(project);
-        for (TSClassDumpEngineMethod method : engineMethods) {
-            if (method.getFunctionType() != TSFunctionType.GLOBAL)
-                continue;
-            result.addElement(
-                    LookupElementBuilder.create(method)
-                            .withCaseSensitivity(false)
-                            .withTailText(method.getArgList())
                             .withInsertHandler(TSCaseCorrectingInsertHandler.INSTANCE)
             );
         }

@@ -20,7 +20,7 @@ import javax.swing.*;
 
 public class TSClassDumpPsiImplUtil {
 
-    public String getName(TSClassDumpClassDecl element) {
+    public static String getName(TSClassDumpClassDecl element) {
         TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
         if (idents == null || idents.length == 0) {
             return null;
