@@ -24,31 +24,39 @@
     consumeTokenMethod(".*expr")="consumeTokenFast"
 }
 
-tsFile ::= decl *
+tsFile ::= decl* {pin=1}
 
 private decl ::=
-    stmt
+    package_decl
     |
     fn_decl_stmt
     |
-    package_decl
+    stmt_decl
+    {recoverWhile=decl_recover}
+
+private stmt_decl ::= stmt {pin=1 recoverWhile=decl_recover}
+
+// All possible tokens a decl can start with
+private decl_recover ::= !(FUNCTION | PACKAGE | IF | ELSE | WHILE | FOR | SWITCH | SWITCHSTR | CASE | DEFAULT | CASEOR | BREAK | CONTINUE | RETURN | DATABLOCK | NEW | GLOBALVAR | LOCALVAR | ID | INTEGER | STRATOM | TAGATOM | FLOAT | OP_NOT | OP_BIT_NOT | PAREN_OPEN | BRACE_OPEN | BRACKET_OPEN)
 
 package_decl ::=
     PACKAGE ID BRACE_OPEN fn_decl_stmt* BRACE_CLOSE SEMICOLON
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement"
-    methods=[getName getNameIdentifier setName]}
+    methods=[getName getNameIdentifier setName]
+    pin=1 recoverWhile=decl_recover}
 
 fn_decl_stmt ::=
-    FUNCTION fn_name_stmt var_list? PAREN_CLOSE BRACE_OPEN stmt* BRACE_CLOSE
+    FUNCTION fn_name_stmt PAREN_OPEN var_list? PAREN_CLOSE curly_stmt_block
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
-     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace getFunctionType getArgList]}
+     methods=[getFunctionName getName setName getNameIdentifier getPresentation getNamespace getFunctionType getArgList]
+     pin=1 recoverWhile=decl_recover}
 
 // Needs the PAREN_OPEN otherwise NS functions will match as global
 fn_name_stmt ::=
-    ID PAREN_OPEN
+    ID COLON_DOUBLE ID
     |
-    ID COLON_DOUBLE ID PAREN_OPEN
-{methods=[getFunctionName getNamespace getFunctionType]}
+    ID
+{methods=[getFunctionName getNamespace getFunctionType] pin=2}
 
 var_list ::=
     var_group (COMMA var_group)*
@@ -81,62 +89,70 @@ private stmt ::=
 
 if_stmt ::=
 //Most specific rule comes first, so that means the else-case
-    IF PAREN_OPEN expr PAREN_CLOSE stmt_block ELSE stmt_block
-    |
-    IF PAREN_OPEN expr PAREN_CLOSE stmt_block
+    IF PAREN_OPEN expr PAREN_CLOSE stmt_block (ELSE stmt_block)?
+    {pin=1}
 
 while_stmt ::=
     WHILE PAREN_OPEN expr PAREN_CLOSE stmt_block
     |
     DO stmt_block WHILE PAREN_OPEN expr PAREN_CLOSE
+    {pin('.*')=1}
 
 for_stmt ::=
-    FOR PAREN_OPEN expr SEMICOLON expr SEMICOLON expr PAREN_CLOSE stmt_block
+    FOR for_args_stmt stmt_block
+   {pin=1}
+
+private for_args_stmt ::=
+    PAREN_OPEN expr SEMICOLON expr SEMICOLON expr PAREN_CLOSE
     |
-    FOR PAREN_OPEN expr SEMICOLON expr SEMICOLON      PAREN_CLOSE stmt_block
+    PAREN_OPEN expr SEMICOLON expr SEMICOLON      PAREN_CLOSE
     |
-    FOR PAREN_OPEN expr SEMICOLON      SEMICOLON expr PAREN_CLOSE stmt_block
+    PAREN_OPEN expr SEMICOLON      SEMICOLON expr PAREN_CLOSE
     |
-    FOR PAREN_OPEN expr SEMICOLON      SEMICOLON      PAREN_CLOSE stmt_block
+    PAREN_OPEN expr SEMICOLON      SEMICOLON      PAREN_CLOSE
     |
-    FOR PAREN_OPEN      SEMICOLON expr SEMICOLON expr PAREN_CLOSE stmt_block
+    PAREN_OPEN      SEMICOLON expr SEMICOLON expr PAREN_CLOSE
     |
-    FOR PAREN_OPEN      SEMICOLON expr SEMICOLON      PAREN_CLOSE stmt_block
+    PAREN_OPEN      SEMICOLON expr SEMICOLON      PAREN_CLOSE
     |
-    FOR PAREN_OPEN      SEMICOLON      SEMICOLON expr PAREN_CLOSE stmt_block
+    PAREN_OPEN      SEMICOLON      SEMICOLON expr PAREN_CLOSE
     |
-    FOR PAREN_OPEN      SEMICOLON      SEMICOLON      PAREN_CLOSE stmt_block
+    PAREN_OPEN      SEMICOLON      SEMICOLON      PAREN_CLOSE
 
 foreach_stmt ::=
     FOREACH PAREN_OPEN var_group IN expr PAREN_CLOSE stmt_block
     |
     FOREACHSTR PAREN_OPEN var_group IN expr PAREN_CLOSE stmt_block
+    {pin('.*')=1}
 
 datablock_decl ::=
     DATABLOCK ID PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
     {extends=object_expr
-    methods=[getName getClassName getParentName]}
+    methods=[getName getClassName getParentName]
+    pin('.*')=1}
 
 switch_stmt ::=
     SWITCH PAREN_OPEN expr PAREN_CLOSE BRACE_OPEN case_stmt* default_stmt? BRACE_CLOSE
     |
     SWITCHSTR PAREN_OPEN expr PAREN_CLOSE BRACE_OPEN case_stmt* default_stmt? BRACE_CLOSE
+    {pin=1}
 
 case_stmt ::=
     CASE case_expr COLON stmt*
+    {pin=1}
 
 default_stmt ::=
     DEFAULT COLON stmt*
+    {pin=1}
 
 case_expr ::=
     expr (CASEOR expr)*
 
-break_stmt ::= BREAK SEMICOLON
-continue_stmt ::= CONTINUE SEMICOLON
+break_stmt ::= BREAK SEMICOLON {pin=1}
+continue_stmt ::= CONTINUE SEMICOLON {pin=1}
 return_stmt ::=
-    RETURN SEMICOLON
-    |
-    RETURN expr SEMICOLON
+    RETURN expr? SEMICOLON
+    {pin=1}
 
 //Block of statements eg after an if condition
 stmt_block ::=
@@ -160,7 +176,7 @@ field_assign ::=
 
 //Statement that is just an expression and a semi
 expression_stmt ::=
-    expr_stmt_group SEMICOLON
+    expr_stmt_group SEMICOLON {pin=2}
 
 external expr_stmt_group ::= parseExpressionStmtGroup
 

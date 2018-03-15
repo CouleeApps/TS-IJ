@@ -17,22 +17,22 @@
     tokenTypeClass="com.torquescript.psi.TSTokenType"
 
     tokens = [
-        rwFUNCTION='function'
-        rwPACKAGE='package'
-        rwIF='if'
-        rwELSE='else'
-        rwWHILE='while'
-        rwFOR='for'
-        rwSWITCH='switch'
-        rwSWITCHSTR='switch$'
-        rwCASE='case'
-        rwDEFAULT='default'
-        rwCASEOR='or'
-        rwBREAK='break'
-        rwCONTINUE='continue'
-        rwRETURN='return'
-        rwDATABLOCK='datablock'
-        rwNEW='new'
+        FUNCTION='function'
+        PACKAGE='package'
+        IF='if'
+        ELSE='else'
+        WHILE='while'
+        FOR='for'
+        SWITCH='switch'
+        SWITCHSTR='switch$'
+        CASE='case'
+        DEFAULT='default'
+        CASEOR='or'
+        BREAK='break'
+        CONTINUE='continue'
+        RETURN='return'
+        DATABLOCK='datablock'
+        NEW='new'
 
         INTEGER='regexp:[0-9]+'
         FLOAT='regexp:(([0-9]+)\.([0-9]+))|(([0-9]+)(\.([0-9]+))?[eE][+-]?([0-9]+))|(\.([0-9]+))|((\.([0-9]+))?[eE][+-]?([0-9]+))'
@@ -61,17 +61,18 @@ decl ::=
     fn_decl_stmt
     |
     package_decl
+    {recoverWhile=decl_recover}
 
 package_decl ::=
-    rwPACKAGE ID '{' fn_decl_stmt* '}' ';' {pin=1}
+    PACKAGE ID '{' fn_decl_stmt* '}' ';' {pin=1}
 
 fn_decl_stmt ::=
-    rwFUNCTION fn_name_stmt ('(' var_list? ')') curly_stmt_block {pin(".*")=1}
+    FUNCTION fn_name_stmt ('(' var_list? ')') curly_stmt_block {pin(".*")=1}
 
 fn_name_stmt ::=
-    ID
-    |
     ID '::' ID
+    |
+    ID
 
 var_list ::=
     VAR (',' VAR)*
@@ -100,45 +101,45 @@ stmt ::=
 
 if_stmt ::=
 //Most specific rule comes first, so that means the else-case
-    rwIF paren_conditional_block stmt_block (rwELSE stmt_block)?
+    IF paren_conditional_block stmt_block (ELSE stmt_block)?
     {pin(".*")=1}
 
 while_stmt ::=
-    rwWHILE paren_conditional_block stmt_block
+    WHILE paren_conditional_block stmt_block
     //Do-while not in MBTS
     {pin(".*")=1}
 
 for_stmt ::=
-    rwFOR '(' expr ';' expr ';' expr ')' stmt_block
+    FOR '(' expr ';' expr ';' expr ')' stmt_block
     //Partial for not in MBTS
     {pin(".*")=1}
 
 datablock_decl ::=
-    rwDATABLOCK ID ('(' ID (':' ID)? ')') ('{' field_list '}') ';'
+    DATABLOCK ID ('(' ID (':' ID)? ')') ('{' field_list '}') ';'
     {pin(".*")=1}
 
 switch_stmt ::=
-    rwSWITCH paren_conditional_block '{' case_stmt* default_stmt? '}'
+    SWITCH paren_conditional_block '{' case_stmt* default_stmt? '}'
     |
-    rwSWITCHSTR paren_conditional_block '{' case_stmt* default_stmt? '}'
+    SWITCHSTR paren_conditional_block '{' case_stmt* default_stmt? '}'
 
 case_stmt ::=
-    rwCASE case_expr ':' stmt*
+    CASE case_expr ':' stmt*
     {pin(".*")=1}
 
 default_stmt ::=
-    rwDEFAULT ':' stmt*
+    DEFAULT ':' stmt*
     {pin(".*")=1}
 
 case_expr ::=
-    expr (rwCASEOR expr)*
+    expr (CASEOR expr)*
 
-break_stmt ::= rwBREAK ';' {pin(".*")=1}
-continue_stmt ::= rwCONTINUE ';' {pin(".*")=1}
+break_stmt ::= BREAK ';' {pin(".*")=1}
+continue_stmt ::= CONTINUE ';' {pin(".*")=1}
 return_stmt ::=
-    rwRETURN ';'
+    RETURN ';'
     |
-    rwRETURN expr ';'
+    RETURN expr ';'
 
 //Block of statements eg after an if condition
 stmt_block ::=
@@ -167,7 +168,7 @@ field_list ::=
 field_assign ::=
     ID '=' expr ';'
     |
-    rwDATABLOCK '=' expr ';'
+    DATABLOCK '=' expr ';'
     |
     ID '[' array_index_expr ']' '=' expr ';'
 
@@ -226,7 +227,7 @@ private concat_group ::= concat_expr | concat_space_expr | concat_tab_expr | con
 private unary_bool_group ::= not_expr | bit_not_expr
 
 object_expr ::=
-    rwNEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' ('{' field_assign* (object_expr ';')* '}')?
+    NEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' ('{' field_assign* (object_expr ';')* '}')?
 
 class_name_expr ::=
     ID
@@ -301,7 +302,7 @@ private assign_expr ::=
 //Call group
 call_global_expr ::= ID args {pin=2}
 call_ns_global_expr ::= ID '::' ID args {pin=4}
-call_ref_expr ::= expr '.' ID args {pin=4}
+call_ref_expr ::= expr indirection ID args {pin=4}
 
 private args ::= '(' arg_list? ')' {pin=1}
 private arg_list ::= arg (',' arg)* {pin('.*')=1}
@@ -310,8 +311,8 @@ private recover_arg ::= !(',' | ')')
 
 //Access group
 ref_var_index_expr ::= VAR '[' array_index_expr ']'
-ref_index_expr ::= expr '.' ID '[' array_index_expr ']'
-ref_expr ::= expr '.' ID
+ref_index_expr ::= expr indirection ID '[' array_index_expr ']'
+ref_expr ::= expr indirection ID
 //Primary group
 literal_expr ::= TAGATOM | STRATOM | FLOAT | INTEGER | VAR | ID
 paren_expr ::= '(' expr ')'
@@ -319,5 +320,9 @@ paren_expr ::= '(' expr ')'
 //-----------------------------------------------------------------------------
 //Helpers
 
+private indirection ::= '.' | '->' | '-->'
+
 private array_index_expr ::= expr (',' expr)*
 dummy ::= 'dummy'
+
+private decl_recover ::= !(FUNCTION | PACKAGE | IF | ELSE | WHILE | FOR | SWITCH | SWITCHSTR | CASE | DEFAULT | CASEOR | BREAK | CONTINUE | RETURN | DATABLOCK | NEW | VAR | ID | INTEGER | STRATOM | TAGATOM | FLOAT | '!' | '~' | '(' | ')')
