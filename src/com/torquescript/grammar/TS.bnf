@@ -280,9 +280,14 @@ private assign_block ::=
 
 //Call group
 fake call_expr ::= {methods=[getReference getFunctionName getNameNode getFunctionType isParentCall getParentFunction]}
-call_global_expr ::= ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
-call_method_expr ::= expr indirection ID PAREN_OPEN arg_list? PAREN_CLOSE {extends=call_expr}
+call_global_expr ::= ID args {extends=call_expr}
+call_global_ns_expr ::= (ID | PARENT) COLON_DOUBLE ID args {extends=call_expr}
+call_method_expr ::= expr indirection ID args {extends=call_expr}
+
+private args ::= PAREN_OPEN arg_list? PAREN_CLOSE {pin=1}
+private arg_list ::= arg (COMMA arg)* {pin('.*')=1}
+private arg ::= expr {pin=1 recoverWhile=recover_arg}
+private recover_arg ::= !(COMMA | PAREN_CLOSE)
 
 //Access group
 ref_var_index_expr ::= var_group BRACKET_OPEN array_index_expr BRACKET_CLOSE
@@ -297,9 +302,8 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 
 private indirection ::= DOT | POINT_INTERNAL | POINT_INTERNAL_RECURSIVE
 private array_index_expr ::= expr (COMMA expr)*
-private arg_list ::= expr (COMMA expr)*
-bool_expr ::= TRUE | FALSE
 
+bool_expr ::= TRUE | FALSE
 fake var_expr ::= {methods=[getName isLocal getReference]}
 private global_var ::= GLOBALVAR {extends=var_expr}
 private local_var ::= LOCALVAR {extends=var_expr}

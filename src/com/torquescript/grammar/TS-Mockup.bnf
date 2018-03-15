@@ -295,9 +295,15 @@ private assign_expr ::=
     ('+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '^=' | '|=' | '<<=' | '>>=') expr
 
 //Call group
-call_global_expr ::= ID '(' arg_list? ')'
-call_ns_global_expr ::= ID '::' ID '(' arg_list? ')'
-call_ref_expr ::= expr '.' ID '(' arg_list? ')'
+call_global_expr ::= ID args {pin=2}
+call_ns_global_expr ::= ID '::' ID args {pin=4}
+call_ref_expr ::= expr '.' ID args {pin=4}
+
+private args ::= '(' arg_list? ')' {pin=1}
+private arg_list ::= arg (',' arg)* {pin('.*')=1}
+private arg ::= expr {pin=1 recoverWhile=recover_arg}
+private recover_arg ::= !(',' | ')')
+
 //Access group
 ref_var_index_expr ::= VAR '[' array_index_expr ']'
 ref_index_expr ::= expr '.' ID '[' array_index_expr ']'
@@ -310,5 +316,4 @@ paren_expr ::= '(' expr ')'
 //Helpers
 
 private array_index_expr ::= expr (',' expr)*
-private arg_list ::= expr (',' expr)*
 dummy ::= 'dummy'

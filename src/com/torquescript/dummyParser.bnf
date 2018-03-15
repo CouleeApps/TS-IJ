@@ -1,0 +1,45 @@
+{
+    tokens = [
+        rwFUNCTION='function'
+        rwPACKAGE='package'
+        rwIF='if'
+        rwELSE='else'
+        rwWHILE='while'
+        rwFOR='for'
+        rwSWITCH='switch'
+        rwSWITCHSTR='switch$'
+        rwCASE='case'
+        rwDEFAULT='default'
+        rwCASEOR='or'
+        rwBREAK='break'
+        rwCONTINUE='continue'
+        rwRETURN='return'
+        rwDATABLOCK='datablock'
+        rwNEW='new'
+
+        INTEGER='regexp:[0-9]+'
+        FLOAT='regexp:(([0-9]+)\.([0-9]+))|(([0-9]+)(\.([0-9]+))?[eE][+-]?([0-9]+))|(\.([0-9]+))|((\.([0-9]+))?[eE][+-]?([0-9]+))'
+        ID='regexp:[A-Za-z_][A-Za-z0-9_]*'
+        VAR='regexp:[$%][A-Za-z_]([:A-Za-z0-9_]*[A-Za-z0-9_])*'
+        SPACE='regexp:[ \t\v\f]'
+        HEXNUM='regexp:0[xX][a-fA-F0-9]+'
+        COMMENT='regexp://[^\n\r]*'
+        //https://stackoverflow.com/a/249937/214063
+        STRATOM='regexp:"(?:[^"\\]|\\.)*"'
+        TAGATOM="regexp:'(?:[^'\\]|\\.)*'"
+    ]
+}
+
+
+root ::= call*
+
+call ::= ID args ';' {pin=2}
+
+args ::= '(' arg_list? ')' {pin=1}
+
+arg_list ::= arg (',' arg)* {pin('.*')=1}
+arg ::= dummy_arg {pin=1}
+
+dummy_arg ::= INTEGER {recoverWhile=recover_arg_list}
+
+private recover_arg_list ::= !(',' | ')')
