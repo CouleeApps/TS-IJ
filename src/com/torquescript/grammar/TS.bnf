@@ -140,9 +140,13 @@ return_stmt ::=
 
 //Block of statements eg after an if condition
 stmt_block ::=
-    BRACE_OPEN stmt* BRACE_CLOSE
+    curly_stmt_block
     |
     stmt
+
+private curly_stmt_block ::= BRACE_OPEN stmt_list BRACE_CLOSE {pin=1}
+private stmt_list ::= stmt* {pin('.*')=1 recoverWhile=recover_stmt}
+private recover_stmt ::= !('}' | ';')
 
 field_list ::=
     field_assign+

@@ -61,9 +61,6 @@ decl ::=
     fn_decl_stmt
     |
     package_decl
-    {recoverWhile="decl_recover"}
-
-private decl_recover ::= !(rwPACKAGE | rwFUNCTION | '}')
 
 package_decl ::=
     rwPACKAGE ID '{' fn_decl_stmt* '}' ';' {pin=1}
@@ -150,8 +147,15 @@ stmt_block ::=
     stmt
 
 private curly_stmt_block ::=
-    '{' stmt* '}'
+    '{' stmt_list '}'
     {pin=1}
+
+private stmt_list ::= stmt* {pin('.*')=1 recoverWhile=recover_stmt}
+
+
+//private stmt ::= expr {pin=1 recoverWhile=recover_stmt}
+private recover_stmt ::= !('}' | ';')
+
 
 private paren_conditional_block ::=
     '(' expr ')'

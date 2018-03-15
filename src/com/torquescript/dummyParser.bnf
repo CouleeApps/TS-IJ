@@ -31,15 +31,17 @@
 }
 
 
-root ::= call*
+root ::= stmt*
+
+stmt ::= block_stmt | call
 
 call ::= ID args ';' {pin=2}
 
 args ::= '(' arg_list? ')' {pin=1}
 
 arg_list ::= arg (',' arg)* {pin('.*')=1}
-arg ::= dummy_arg {pin=1}
-
-dummy_arg ::= INTEGER {recoverWhile=recover_arg_list}
-
+arg ::= INTEGER {pin=1 recoverWhile=recover_arg_list}
 private recover_arg_list ::= !(',' | ')')
+
+block_stmt ::= '{' call* '}' {pin=1}
+
