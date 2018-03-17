@@ -218,19 +218,19 @@ private unary_bool_group ::= not_expr | bit_not_expr
 
 //Object declaration is pretty straightforward
 object_expr ::=
-    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
+    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE object_fields_expr?
     |
-    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE
-    |
-    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
-    |
-    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE
-    {methods=[getName getClassName getParentName]}
+    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE object_fields_expr?
+    {methods=[getName getClassName getParentName] pin('.*')=1}
+
+private object_fields_expr ::=
+    BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
+    {pin=1}
 
 class_name_expr ::=
-    ID
-    |
     PAREN_OPEN expr PAREN_CLOSE
+    |
+    ID
 
 //-----------------------------------------------------------------------------
 // The relatively decent and normal expression section

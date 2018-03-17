@@ -59,6 +59,7 @@ BLOCK_COMMENT = (\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/.*)
     "datablock"                                     { return TSTypes.DATABLOCK; }
     "in"                                            { return TSTypes.IN; }
     "do"                                            { return TSTypes.DO; }
+    "singleton"                                     { return TSTypes.SINGLETON; }
     "foreach"                                       { return TSTypes.FOREACH; }
     "foreach$"                                      { return TSTypes.FOREACHSTR; }
     //Unused in T3D as of 2018-03

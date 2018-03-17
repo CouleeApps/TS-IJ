@@ -325,4 +325,4 @@ private indirection ::= '.' | '->' | '-->'
 private array_index_expr ::= expr (',' expr)*
 dummy ::= 'dummy'
 
-private decl_recover ::= !(FUNCTION | PACKAGE | IF | ELSE | WHILE | FOR | SWITCH | SWITCHSTR | CASE | DEFAULT | CASEOR | BREAK | CONTINUE | RETURN | DATABLOCK | NEW | VAR | ID | INTEGER | STRATOM | TAGATOM | FLOAT | '!' | '~' | '(' | ')')
+private decl_recover ::= !(FUNCTION | PACKAGE | IF | ELSE | WHILE | FOR | SWITCH | SWITCHSTR | CASE | DEFAULT | CASEOR | BREAK | CONTINUE | RETURN | DATABLOCK | NEW | VAR | ID | INTEGER | STRATOM | TAGATOM | FLOAT | '!' | '~' | '(' | '[' | '{')

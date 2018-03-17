@@ -2,17 +2,16 @@ E easy (probably)
 
   Docstring in the popup
   Classes with the completion for stuff we can check
-  Pin and recoverWhile for the grammar so typing doesn't blow up the whole file
   Local variable references
   Package functions?
   Path completion in strings
 E Function decls should be references to themselves
-  Standard fields for classes? How to export those from engine?
   TorqueML?
   Support for syntax highlighting in commands?
   Outline/structure viewer
 E Arg indication in completion popup?
   Icons
+  Fields annotated and completed as exported from the engine
 
   Annotations:
   Unset variable usage
