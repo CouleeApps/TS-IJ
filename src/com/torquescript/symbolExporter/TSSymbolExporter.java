@@ -164,7 +164,7 @@ public class TSSymbolExporter {
         indicator.setFraction(1);
 
         //Update this immediately
-        TSUtil.getEngineMethodList(runConfiguration.getProject());
+        TSUtil.getSymbolList(runConfiguration.getProject()).buildEngineMethodList(this);
 
         return true;
     }

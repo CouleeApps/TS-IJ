@@ -10,18 +10,25 @@ import com.torquescript.symbols.*;
 import java.util.*;
 
 public class TSUtil {
-    private static TSCachedList<TSFnDeclStmt> FUNCTIONS = new TSCachedList<>(new TSFunctionCachedListGenerator());
-    private static TSCachedList<TSClassDumpEngineMethod> ENGINE_METHODS = new TSCachedList<>(new TSEngineMethodCachedListGenerator());
-    private static TSCachedList<TSVarExpr> GLOBALS = new TSCachedList<>(new TSGlobalCachedListGenerator());
-    private static TSCachedList<TSObjectExpr> OBJECTS = new TSCachedList<>(new TSObjectCachedListGenerator());
+    private static Map<Project, TSSymbolList> symbolLists = new HashMap<>();
+
+    public static TSSymbolList getSymbolList(Project project) {
+        if (symbolLists.containsKey(project)) {
+            return symbolLists.get(project);
+        }
+
+        TSSymbolList symbolList = new TSSymbolList(project);
+        symbolLists.put(project, symbolList);
+        return symbolList;
+    }
 
     /**
      * Find all function in the project.
      * @param project Containing project in which to search
      * @return A list of functions
      */
-    public static List<TSFnDeclStmt> getFunctionList(Project project) {
-        return new ArrayList<>(FUNCTIONS.getList(project));
+    public static Collection<TSFnDeclStmt> getFunctionList(Project project) {
+        return getSymbolList(project).getFunctionList();
     }
 
     /**
@@ -31,17 +38,7 @@ public class TSUtil {
      * @return A function declaration, or null if none is found
      */
     public static List<TSFnDeclStmt> findFunction(Project project, String key) {
-        List<TSFnDeclStmt> result = null;
-        Collection<TSFnDeclStmt> functions = new ArrayList<>(FUNCTIONS.getList(project));
-        for (TSFnDeclStmt function : functions) {
-            if (key.equalsIgnoreCase(function.getFunctionName())) {
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-                result.add(function);
-            }
-        }
-        return result == null ? Collections.emptyList() : result;
+        return getSymbolList(project).findFunction(key);
     }
 
     /**
@@ -49,8 +46,8 @@ public class TSUtil {
      * @param project Containing project in which to search
      * @return A list of functions
      */
-    public static List<TSClassDumpEngineMethod> getEngineMethodList(Project project) {
-        return new ArrayList<>(ENGINE_METHODS.getList(project));
+    public static Collection<TSClassDumpEngineMethod> getEngineMethodList(Project project) {
+        return getSymbolList(project).getEngineMethodList();
     }
 
     /**
@@ -60,17 +57,7 @@ public class TSUtil {
      * @return A function declaration, or null if none is found
      */
     public static List<TSClassDumpEngineMethod> findEngineMethod(Project project, String key) {
-        List<TSClassDumpEngineMethod> result = null;
-        Collection<TSClassDumpEngineMethod> methods = new ArrayList<>(ENGINE_METHODS.getList(project));
-        for (TSClassDumpEngineMethod method : methods) {
-            if (key.equalsIgnoreCase(method.getFunctionName())) {
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-                result.add(method);
-            }
-        }
-        return result == null ? Collections.emptyList() : result;
+        return getSymbolList(project).findEngineMethod(key);
     }
 
     /**
@@ -78,8 +65,8 @@ public class TSUtil {
      * @param project Containing project in which to search
      * @return A list of functions
      */
-    public static List<TSVarExpr> getGlobalList(Project project) {
-        return new ArrayList<>(GLOBALS.getList(project));
+    public static Collection<TSVarExpr> getGlobalList(Project project) {
+        return getSymbolList(project).getGlobalList();
     }
 
     /**
@@ -89,17 +76,7 @@ public class TSUtil {
      * @return A function declaration, or null if none is found
      */
     public static List<TSVarExpr> findGlobal(Project project, String key) {
-        List<TSVarExpr> result = null;
-        Collection<TSVarExpr> globals = new ArrayList<>(GLOBALS.getList(project));
-        for (TSVarExpr global : globals) {
-            if (key.equalsIgnoreCase(global.getName())) {
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-                result.add(global);
-            }
-        }
-        return result == null ? Collections.emptyList() : result;
+        return getSymbolList(project).findGlobal(key);
     }
 
     /**
@@ -107,8 +84,8 @@ public class TSUtil {
      * @param project Containing project in which to search
      * @return A list of functions
      */
-    public static List<TSObjectExpr> getObjectList(Project project) {
-        return new ArrayList<>(OBJECTS.getList(project));
+    public static Collection<TSObjectExpr> getObjectList(Project project) {
+        return getSymbolList(project).getObjectList();
     }
 
     /**
@@ -118,17 +95,7 @@ public class TSUtil {
      * @return A function declaration, or null if none is found
      */
     public static List<TSObjectExpr> findObject(Project project, String key) {
-        List<TSObjectExpr> result = null;
-        Collection<TSObjectExpr> objects = new ArrayList<>(OBJECTS.getList(project));
-        for (TSObjectExpr object : objects) {
-            if (key.equalsIgnoreCase(object.getName())) {
-                if (result == null) {
-                    result = new ArrayList<>();
-                }
-                result.add(object);
-            }
-        }
-        return result == null ? Collections.emptyList() : result;
+        return getSymbolList(project).findObject(key);
     }
 
     public static String getElementNamespace(PsiElement element) {
