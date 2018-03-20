@@ -35,6 +35,7 @@ public class TSSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey BRACKETS = createTextAttributesKey("TS_BRACKETS", DefaultLanguageHighlighterColors.BRACKETS);
     public static final TextAttributesKey FUNCTION = createTextAttributesKey("TS_FUNCTION", DefaultLanguageHighlighterColors.FUNCTION_DECLARATION);
     public static final TextAttributesKey CLASSNAME = createTextAttributesKey("TS_CLASSNAME", DefaultLanguageHighlighterColors.CLASS_NAME);
+    public static final TextAttributesKey FIELD_NAME = createTextAttributesKey("TS_FIELD_NAME", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
     public static final TextAttributesKey FUNCTION_CALL = createTextAttributesKey("TS_FUNCTION_CALL", DefaultLanguageHighlighterColors.FUNCTION_CALL);
     public static final TextAttributesKey OBJECT_NAME = createTextAttributesKey("TS_OBJECT_NAME", DefaultLanguageHighlighterColors.IDENTIFIER);
 

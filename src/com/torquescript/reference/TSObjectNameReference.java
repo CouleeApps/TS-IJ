@@ -7,10 +7,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.torquescript.TSIcons;
 import com.torquescript.TSUtil;
-import com.torquescript.psi.TSLiteralExpr;
-import com.torquescript.psi.TSObjectExpr;
-import com.torquescript.psi.TSTypes;
-import com.torquescript.psi.TSVarExpr;
+import com.torquescript.psi.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +33,7 @@ public class TSObjectNameReference extends PsiReferenceBase<PsiElement> implemen
         name = expr.getName();
     }
 
-    public TSObjectNameReference(PsiNamedElement expr) {
+    public TSObjectNameReference(TSObjectNameExpr expr) {
         super(expr, expr.getTextRange());
         name = expr.getName();
     }
@@ -71,9 +68,7 @@ public class TSObjectNameReference extends PsiReferenceBase<PsiElement> implemen
             if (global.getName() != null && global.getName().length() > 0) {
                 variants.add(LookupElementBuilder.create(global)
                         .withIcon(TSIcons.FILE)
-                        .withTypeText(global.getContainingFile().getName())
                         .withCaseSensitivity(false)
-
                 );
             }
         }

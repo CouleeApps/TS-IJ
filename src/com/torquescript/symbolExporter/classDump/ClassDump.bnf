@@ -92,6 +92,8 @@ arg ::= type identifier (EQUALS value)?
 member ::=
     block_comment? type identifier BRACKET_OPEN INTEGER BRACKET_CLOSE SEMICOLON
     | block_comment? type identifier SEMICOLON
+    {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
+          methods=[getName setName getNameIdentifier getTypeString getPresentation]}
 
 value ::=
     STRATOM

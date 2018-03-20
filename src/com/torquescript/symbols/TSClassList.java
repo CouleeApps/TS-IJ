@@ -4,6 +4,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.symbolExporter.TSSymbolExporter;
 import com.torquescript.symbolExporter.classDump.TSClassDumpFile;
 import com.torquescript.symbolExporter.classDump.psi.TSClassDumpClassDecl;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpGroup;
+import com.torquescript.symbolExporter.classDump.psi.TSClassDumpMember;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +90,27 @@ public class TSClassList {
                         parentClasses.put(className, parentName);
                     }
                     TSClass newClass = new TSClass(className, classDecl);
-                    //TODO: Add fields
+
+                    TSClassDumpMember[] members = PsiTreeUtil.getChildrenOfType(classDecl, TSClassDumpMember.class);
+                    if (members != null) {
+                        for (TSClassDumpMember member : members) {
+                            TSClassMember classMember = new TSClassMember(member.getName(), member.getTypeString(), member);
+                            newClass.addMember(classMember);
+                        }
+                    }
+                    TSClassDumpGroup[] groups = PsiTreeUtil.getChildrenOfType(classDecl, TSClassDumpGroup.class);
+                    if (groups != null) {
+                        for (TSClassDumpGroup group : groups) {
+                            members = PsiTreeUtil.getChildrenOfType(group, TSClassDumpMember.class);
+                            if (members != null) {
+                                for (TSClassDumpMember member : members) {
+                                    TSClassMember classMember = new TSClassMember(member.getName(), member.getTypeString(), member);
+                                    newClass.addMember(classMember);
+                                }
+                            }
+                        }
+                    }
+
                     allClasses.add(newClass);
                     nameToClass.put(className, newClass);
                 }

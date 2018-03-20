@@ -16,11 +16,11 @@ import javax.swing.*;
 public class TSClassDumpPsiImplUtil {
 
     public static String getName(TSClassDumpClassDecl element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0].getText();
+        return ident.getText();
     }
 
     public static PsiElement setName(TSClassDumpClassDecl element, @NotNull String name) throws IncorrectOperationException {
@@ -28,11 +28,11 @@ public class TSClassDumpPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(TSClassDumpClassDecl element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0];
+        return ident;
     }
 
     public static ItemPresentation getPresentation(TSClassDumpClassDecl element) {
@@ -70,11 +70,11 @@ public class TSClassDumpPsiImplUtil {
     }
 
     public static String getName(TSClassDumpNamespaceDecl element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0].getText();
+        return ident.getText();
     }
 
     public static PsiElement setName(TSClassDumpNamespaceDecl element, @NotNull String name) throws IncorrectOperationException {
@@ -82,11 +82,11 @@ public class TSClassDumpPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(TSClassDumpNamespaceDecl element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0];
+        return ident;
     }
 
     public static ItemPresentation getPresentation(TSClassDumpNamespaceDecl element) {
@@ -120,19 +120,19 @@ public class TSClassDumpPsiImplUtil {
     }
 
     public static PsiElement getNameIdentifier(TSClassDumpEngineMethod element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0];
+        return ident;
     }
 
     public static String getFunctionName(TSClassDumpEngineMethod element) {
-        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
-        if (idents == null || idents.length == 0) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
             return null;
         }
-        return idents[0].getText();
+        return ident.getText();
     }
 
     public static String getNamespace(TSClassDumpEngineMethod element) {
@@ -166,18 +166,68 @@ public class TSClassDumpPsiImplUtil {
         }
     }
 
-    public static ItemPresentation getPresentation(final TSClassDumpEngineMethod function) {
+    public static ItemPresentation getPresentation(final TSClassDumpEngineMethod element) {
         return new ItemPresentation() {
             @Nullable
             @Override
             public String getPresentableText() {
-                return function.getNamespace() + "::" + function.getFunctionName();
+                return element.getNamespace() + "::" + element.getFunctionName();
             }
 
             @Nullable
             @Override
             public String getLocationString() {
-                return function.getContainingFile().getName();
+                return element.getContainingFile().getName();
+            }
+
+            @Nullable
+            @Override
+            public Icon getIcon(boolean unused) {
+                return TSIcons.FILE;
+            }
+        };
+    }
+
+    public static String getName(TSClassDumpMember element) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
+            return null;
+        }
+        return ident.getText();
+    }
+
+    public static PsiElement setName(TSClassDumpMember element, String newName) {
+        return element;
+    }
+
+    public static PsiElement getNameIdentifier(TSClassDumpMember element) {
+        TSClassDumpIdentifier ident = PsiTreeUtil.getChildOfType(element, TSClassDumpIdentifier.class);
+        if (ident == null) {
+            return null;
+        }
+        return ident;
+    }
+
+    public static String getTypeString(TSClassDumpMember element) {
+        TSClassDumpType ident = PsiTreeUtil.getChildOfType(element, TSClassDumpType.class);
+        if (ident == null) {
+            return null;
+        }
+        return ident.getText();
+    }
+
+    public static ItemPresentation getPresentation(TSClassDumpMember element) {
+        return new ItemPresentation() {
+            @Nullable
+            @Override
+            public String getPresentableText() {
+                return element.getTypeString() + " " + element.getName();
+            }
+
+            @Nullable
+            @Override
+            public String getLocationString() {
+                return element.getContainingFile().getName();
             }
 
             @Nullable

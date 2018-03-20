@@ -10,6 +10,7 @@ public class TSClass {
     private String name;
     private TSClass parentClass;
     private List<TSClass> childClasses;
+    private List<TSClassMember> members;
     private PsiElement element;
 
     public TSClass(String name, PsiElement element) {
@@ -17,6 +18,7 @@ public class TSClass {
         this.element = element;
         this.parentClass = null;
         this.childClasses = new ArrayList<>();
+        this.members = new ArrayList<>();
     }
 
     public String getName() {
@@ -74,4 +76,26 @@ public class TSClass {
     public PsiElement getElement() {
         return element;
     }
+
+    public List<TSClassMember> getMembers() {
+        List<TSClassMember> members = new ArrayList<>();
+        if (parentClass != null) {
+            members.addAll(parentClass.getMembers());
+        }
+        members.addAll(getOwnMembers());
+        return members;
+    }
+
+    public List<TSClassMember> getOwnMembers() {
+        return members;
+    }
+
+    public void addMember(TSClassMember member) {
+        members.add(member);
+    }
+
+    public void removeMember(TSClassMember member) {
+        members.remove(member);
+    }
+
 }

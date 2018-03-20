@@ -171,6 +171,7 @@ field_assign ::=
     DATABLOCK '=' expr ';'
     |
     ID '[' array_index_expr ']' '=' expr ';'
+    {pin=2}
 
 //Statement that is just an expression and a semi
 expression_stmt ::=
@@ -227,7 +228,14 @@ private concat_group ::= concat_expr | concat_space_expr | concat_tab_expr | con
 private unary_bool_group ::= not_expr | bit_not_expr
 
 object_expr ::=
-    NEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' ('{' field_assign* (object_expr ';')* '}')?
+    NEW class_name_expr '(' expr? (':' ID)? (',' expr)* ')' object_fields_expr?
+    {pin=1}
+
+private object_fields_expr ::=
+    '{' (field_assign)* (object_expr ';')* '}'
+    {pin(".*")=1 recoverWhile=recover_fields}
+
+private recover_fields ::= !(';')
 
 class_name_expr ::=
     ID

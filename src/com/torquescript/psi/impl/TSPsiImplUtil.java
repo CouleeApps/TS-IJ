@@ -9,11 +9,8 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSIcons;
 import com.torquescript.TSUtil;
-import com.torquescript.reference.TSClassNameReference;
-import com.torquescript.reference.TSFunctionCallReference;
+import com.torquescript.reference.*;
 import com.torquescript.psi.*;
-import com.torquescript.reference.TSGlobalVariableReference;
-import com.torquescript.reference.TSObjectNameReference;
 import com.torquescript.symbolExporter.classDump.psi.TSClassDumpClassDecl;
 import com.torquescript.symbols.TSClass;
 import org.jetbrains.annotations.Nullable;
@@ -233,11 +230,15 @@ public class TSPsiImplUtil {
     }
 
     public static String getClassName(TSObjectExpr obj) {
+        TSClassExpr name = PsiTreeUtil.getChildOfType(obj, TSClassExpr.class);
+        if (name != null) {
+            return name.getName();
+        }
         TSObjectClassNameExpr classNameExpr = PsiTreeUtil.getChildOfType(obj, TSObjectClassNameExpr.class);
-        if (classNameExpr == null) {
+        if (classNameExpr != null) {
             return null;
         }
-        TSClassExpr name = PsiTreeUtil.getChildOfType(classNameExpr, TSClassExpr.class);
+        name = PsiTreeUtil.getChildOfType(classNameExpr, TSClassExpr.class);
         if (name == null) {
             return null;
         }
@@ -366,20 +367,8 @@ public class TSPsiImplUtil {
         return expr.getText();
     }
 
-    public static PsiElement setName(TSClassExpr expr, String newName) {
-        return expr;
-    }
-
     public static PsiReference getReference(TSClassExpr expr) {
         return new TSClassNameReference(expr);
-    }
-
-    public static PsiElement getNameIdentifier(TSClassExpr expr) {
-        List<TSClass> objects = TSUtil.findScriptClass(expr.getProject(), expr.getName());
-        if (objects == null || objects.size() == 0) {
-            return null;
-        }
-        return objects.get(0).getElement();
     }
 
     public static String getName(TSObjectNameExpr expr) {
@@ -392,20 +381,16 @@ public class TSPsiImplUtil {
         return expr.getText();
     }
 
-    public static PsiElement setName(TSObjectNameExpr expr, String newName) {
-        return expr;
-    }
-
     public static PsiReference getReference(TSObjectNameExpr expr) {
         return new TSObjectNameReference(expr);
     }
 
-    public static PsiElement getNameIdentifier(TSObjectNameExpr expr) {
-        List<TSObjectExpr> objects = TSUtil.findObject(expr.getProject(), expr.getName());
-        if (objects == null || objects.size() == 0) {
-            return null;
-        }
-        return objects.get(0);
+    public static String getName(TSFieldNameExpr expr) {
+        return expr.getText();
+    }
+
+    public static PsiReference getReference(TSFieldNameExpr expr) {
+        return new TSFieldNameReference(expr);
     }
 
     public static String getName(TSPackageDecl pkg) {

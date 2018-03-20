@@ -168,11 +168,9 @@ field_list ::=
     field_assign+
 
 field_assign ::=
-    ID ASSIGN expr SEMICOLON
+    field_name_expr ASSIGN expr SEMICOLON
     |
-    DATABLOCK ASSIGN expr SEMICOLON
-    |
-    ID BRACKET_OPEN array_index_expr BRACKET_CLOSE ASSIGN expr SEMICOLON
+    field_name_expr BRACKET_OPEN array_index_expr BRACKET_CLOSE ASSIGN expr SEMICOLON
 
 //Statement that is just an expression and a semi
 expression_stmt ::=
@@ -336,5 +334,6 @@ private var_group ::= global_var | local_var
 //-----------------------------------------------------------------------------
 //Special classes to set them apart for annotation and references
 
-class_expr ::= ID {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement" methods=[getName setName getReference getNameIdentifier]}
-object_name_expr ::= ID {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement" methods=[getName setName getReference getNameIdentifier]}
+class_expr ::= ID {methods=[getName getReference]}
+object_name_expr ::= ID {methods=[getName getReference]}
+field_name_expr ::= ID | DATABLOCK {methods=[getName getReference]}
