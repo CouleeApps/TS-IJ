@@ -1,17 +1,12 @@
 package com.torquescript.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
-import com.intellij.lang.annotation.Annotator;
-import com.intellij.openapi.application.ApplicationManager;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.TextAttributes;
 import com.intellij.psi.PsiElement;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSUtil;
 import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.highlighting.TSSyntaxHighlighter;
 import com.torquescript.psi.*;
-import com.torquescript.reference.TSLiteralReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

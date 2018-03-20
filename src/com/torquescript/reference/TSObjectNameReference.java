@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class TSLiteralReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
+public class TSObjectNameReference extends PsiReferenceBase<PsiElement> implements PsiPolyVariantReference {
     private String name;
 
     private static TextRange getLiteralRange(TSLiteralExpr expr) {
@@ -31,8 +31,13 @@ public class TSLiteralReference extends PsiReferenceBase<PsiElement> implements 
         return range;
     }
 
-    public TSLiteralReference(TSLiteralExpr expr) {
+    public TSObjectNameReference(TSLiteralExpr expr) {
         super(expr, getLiteralRange(expr));
+        name = expr.getName();
+    }
+
+    public TSObjectNameReference(PsiNamedElement expr) {
+        super(expr, expr.getTextRange());
         name = expr.getName();
     }
 

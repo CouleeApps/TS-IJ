@@ -126,7 +126,7 @@ foreach_stmt ::=
     {pin('.*')=1}
 
 datablock_decl ::=
-    DATABLOCK class_expr PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
+    DATABLOCK class_expr PAREN_OPEN ID object_parent_expr? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
     {extends=object_expr
     methods=[getName getClassName getParentName]
     pin('.*')=1}
@@ -218,16 +218,19 @@ private unary_bool_group ::= not_expr | bit_not_expr
 
 //Object declaration is pretty straightforward
 object_expr ::=
-    NEW class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE object_fields_expr?
+    NEW object_class_name_expr PAREN_OPEN expr? object_parent_expr? (COMMA expr)* PAREN_CLOSE object_fields_expr?
     |
-    SINGLETON class_name_expr PAREN_OPEN expr? (COLON ID)? (COMMA expr)* PAREN_CLOSE object_fields_expr?
+    SINGLETON object_class_name_expr PAREN_OPEN expr? object_parent_expr? (COMMA expr)* PAREN_CLOSE object_fields_expr?
     {methods=[getName getClassName getParentName] pin('.*')=1}
 
 private object_fields_expr ::=
     BRACE_OPEN field_assign* (object_expr SEMICOLON)* BRACE_CLOSE
     {pin=1}
 
-class_name_expr ::=
+object_parent_expr ::= COLON object_name_expr
+    {pin=1}
+
+object_class_name_expr ::=
     PAREN_OPEN expr PAREN_CLOSE
     |
     class_expr
@@ -320,7 +323,6 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 //-----------------------------------------------------------------------------
 //Helpers
 
-class_expr ::= ID {methods=[getName getReference]}
 private indirection ::= DOT | POINT_INTERNAL | POINT_INTERNAL_RECURSIVE
 private array_index_expr ::= expr (COMMA expr)*
 
@@ -330,3 +332,9 @@ private global_var ::= GLOBALVAR {extends=var_expr}
 private local_var ::= LOCALVAR {extends=var_expr}
 
 private var_group ::= global_var | local_var
+
+//-----------------------------------------------------------------------------
+//Special classes to set them apart for annotation and references
+
+class_expr ::= ID {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement" methods=[getName setName getReference getNameIdentifier]}
+object_name_expr ::= ID {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement" methods=[getName setName getReference getNameIdentifier]}

@@ -18,11 +18,7 @@ import org.jetbrains.annotations.NotNull;
 public class TSClassNameAnnotator extends TSAnnotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        TSClassExpr classElement = null;
-        TSClassExpr[] names = PsiTreeUtil.getChildrenOfType(element, TSClassExpr.class);
-        if (names != null && names.length > 0) {
-            classElement = names[0];
-        }
+        TSClassExpr classElement = PsiTreeUtil.getChildOfType(element, TSClassExpr.class);
         if (classElement == null) {
             return;
         }

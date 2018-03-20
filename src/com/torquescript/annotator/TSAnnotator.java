@@ -15,7 +15,7 @@ public class TSAnnotator implements Annotator {
     private static final ThreadLocal<TSAnnotator[]> annotators = ThreadLocal.withInitial(() -> new TSAnnotator[]{
             new TSMethodCallAnnotator(),
             new TSClassNameAnnotator(),
-            new TSObjectAnnotator()
+            new TSObjectNameAnnotator()
     });
 
     //https://github.com/go-lang-plugin-org/go-lang-idea-plugin/blob/master/src/com/goide/highlighting/GoHighlightingAnnotator.java
