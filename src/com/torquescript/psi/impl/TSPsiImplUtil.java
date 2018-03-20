@@ -8,6 +8,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.TSFunctionType;
 import com.torquescript.TSIcons;
+import com.torquescript.reference.TSClassNameReference;
 import com.torquescript.reference.TSFunctionCallReference;
 import com.torquescript.psi.*;
 import com.torquescript.reference.TSGlobalVariableReference;
@@ -323,6 +324,20 @@ public class TSPsiImplUtil {
 
     public static PsiReference getReference(TSLiteralExpr expr) {
         return new TSLiteralReference(expr);
+    }
+
+    public static String getName(TSClassExpr expr) {
+        if (expr.getFirstChild().getNode().getElementType().equals(TSTypes.STRATOM)) {
+            String text = expr.getText();
+            if (text.length() > 1) {
+                return text.substring(1, text.length() - 1);
+            }
+        }
+        return expr.getText();
+    }
+
+    public static PsiReference getReference(TSClassExpr expr) {
+        return new TSClassNameReference(expr);
     }
 
     public static String getName(TSPackageDecl pkg) {

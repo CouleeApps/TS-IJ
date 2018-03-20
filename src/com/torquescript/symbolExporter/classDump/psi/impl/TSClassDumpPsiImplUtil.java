@@ -40,7 +40,7 @@ public class TSClassDumpPsiImplUtil {
         return idents[0];
     }
 
-    public ItemPresentation getPresentation(TSClassDumpClassDecl element) {
+    public static ItemPresentation getPresentation(TSClassDumpClassDecl element) {
         return new ItemPresentation() {
             @Nullable
             @Override
@@ -62,7 +62,19 @@ public class TSClassDumpPsiImplUtil {
         };
     }
 
-    public String getName(TSClassDumpNamespaceDecl element) {
+    public static String getParentName(TSClassDumpClassDecl element) {
+        //See if we have a parent
+        TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
+        if (idents == null) {
+            return null;
+        }
+        if (idents.length > 1) {
+            return idents[1].getText();
+        }
+        return null;
+    }
+
+    public static String getName(TSClassDumpNamespaceDecl element) {
         TSClassDumpIdentifier[] idents = PsiTreeUtil.getChildrenOfType(element, TSClassDumpIdentifier.class);
         if (idents == null || idents.length == 0) {
             return null;
@@ -82,7 +94,7 @@ public class TSClassDumpPsiImplUtil {
         return idents[0];
     }
 
-    public ItemPresentation getPresentation(TSClassDumpNamespaceDecl element) {
+    public static ItemPresentation getPresentation(TSClassDumpNamespaceDecl element) {
         return new ItemPresentation() {
             @Nullable
             @Override

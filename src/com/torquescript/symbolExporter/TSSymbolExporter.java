@@ -21,6 +21,7 @@ import com.torquescript.TSUtil;
 import com.torquescript.runner.TSRunConfiguration;
 import com.torquescript.symbolExporter.classDump.TSClassDumpFile;
 import com.torquescript.symbolExporter.classDump.TSClassDumpFileType;
+import com.torquescript.symbols.TSSymbolList;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -164,7 +165,9 @@ public class TSSymbolExporter {
         indicator.setFraction(1);
 
         //Update this immediately
-        TSUtil.getSymbolList(runConfiguration.getProject()).buildEngineMethodList(this);
+        TSSymbolList symbolList = TSUtil.getSymbolList(runConfiguration.getProject());
+        symbolList.buildEngineMethodList(this);
+        symbolList.buildScriptClassList(this);
 
         return true;
     }

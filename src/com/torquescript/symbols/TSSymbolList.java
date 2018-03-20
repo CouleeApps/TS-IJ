@@ -1,17 +1,11 @@
 package com.torquescript.symbols;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.psi.util.PsiTreeUtil;
-import com.torquescript.model.TSClassList;
 import com.torquescript.psi.TSFnDeclStmt;
 import com.torquescript.psi.TSObjectExpr;
 import com.torquescript.psi.TSVarExpr;
 import com.torquescript.symbolExporter.TSSymbolExporter;
-import com.torquescript.symbolExporter.classDump.TSClassDumpFile;
-import com.torquescript.symbolExporter.classDump.psi.TSClassDumpClassDecl;
 import com.torquescript.symbolExporter.classDump.psi.TSClassDumpEngineMethod;
-import com.torquescript.symbolExporter.classDump.psi.TSClassDumpGroup;
-import com.torquescript.symbolExporter.classDump.psi.TSClassDumpNamespaceDecl;
 
 import java.util.*;
 
@@ -23,22 +17,21 @@ public class TSSymbolList {
     private TSCachedList<TSFnDeclStmt> functions;
     private TSCachedList<TSVarExpr> globals;
     private TSCachedList<TSObjectExpr> objects;
-    private TSClassList classList;
-
-    private final String engineMethodLock = "Lock";
-    private Collection<TSClassDumpEngineMethod> engineMethods;
+    private TSClassList scriptClassList;
+    private TSEngineMethodList engineMethodList;
 
     public TSSymbolList(Project project) {
         this.project = project;
         functions = new TSCachedList<>(project, new TSFunctionCachedListGenerator());
         globals = new TSCachedList<>(project, new TSGlobalCachedListGenerator());
         objects = new TSCachedList<>(project, new TSObjectCachedListGenerator());
-        engineMethods = new HashSet<>();
-        classList = new TSClassList();
+        engineMethodList = new TSEngineMethodList();
+        scriptClassList = new TSClassList();
     }
 
     /**
      * Find all function in the project.
+     *
      * @return A list of functions
      */
     public Collection<TSFnDeclStmt> getFunctionList() {
@@ -47,6 +40,7 @@ public class TSSymbolList {
 
     /**
      * Find a function in the project matching a given string.
+     *
      * @param key Search string compare functions with
      * @return A function declaration, or null if none is found
      */
@@ -66,6 +60,7 @@ public class TSSymbolList {
 
     /**
      * Find all function in the project.
+     *
      * @return A list of functions
      */
     public Collection<TSVarExpr> getGlobalList() {
@@ -74,6 +69,7 @@ public class TSSymbolList {
 
     /**
      * Find a function in the project matching a given string.
+     *
      * @param key Search string compare functions with
      * @return A function declaration, or null if none is found
      */
@@ -93,6 +89,7 @@ public class TSSymbolList {
 
     /**
      * Find all function in the project.
+     *
      * @return A list of functions
      */
     public Collection<TSObjectExpr> getObjectList() {
@@ -101,6 +98,7 @@ public class TSSymbolList {
 
     /**
      * Find a function in the project matching a given string.
+     *
      * @param key Search string compare functions with
      * @return A function declaration, or null if none is found
      */
@@ -118,23 +116,47 @@ public class TSSymbolList {
         return result == null ? Collections.emptyList() : result;
     }
 
-    public TSClassList getClassList() {
-        return classList;
+    /**
+     * Find all script classes in the project.
+     *
+     * @return A list of functions
+     */
+    public Collection<TSClass> getScriptClassList() {
+        return scriptClassList.listBreadthFirst();
     }
 
+    /**
+     * Find a script class in the project matching a given string.
+     *
+     * @param key Search string compare functions with
+     * @return A function declaration, or null if none is found
+     */
+    public List<TSClass> findScriptClass(String key) {
+        List<TSClass> result = null;
+        Collection<TSClass> methods = getScriptClassList();
+        for (TSClass method : methods) {
+            if (key.equalsIgnoreCase(method.getName())) {
+                if (result == null) {
+                    result = new ArrayList<>();
+                }
+                result.add(method);
+            }
+        }
+        return result == null ? Collections.emptyList() : result;
+    }
 
     /**
      * Find all engine function in the project.
+     *
      * @return A list of functions
      */
     public Collection<TSClassDumpEngineMethod> getEngineMethodList() {
-        synchronized (engineMethodLock) {
-            return engineMethods;
-        }
+        return engineMethodList.getList();
     }
 
     /**
      * Find an engine function in the project matching a given string.
+     *
      * @param key Search string compare functions with
      * @return A function declaration, or null if none is found
      */
@@ -153,60 +175,16 @@ public class TSSymbolList {
     }
 
     /**
-     * Build the engine method list from a project from a symbol export list
+     * Build the script class list from a symbol export list
      */
-    public void buildEngineMethodList(TSSymbolExporter exporter) {
-        HashSet<TSClassDumpEngineMethod> methods = new HashSet<>();
-
-        TSClassDumpFile classDump = exporter.getGlobalClasses();
-        if (classDump != null) {
-            //Read global functions from the global dump
-            TSClassDumpClassDecl[] classes = PsiTreeUtil.getChildrenOfType(classDump, TSClassDumpClassDecl.class);
-            if (classes != null) {
-                for (TSClassDumpClassDecl classDecl : classes) {
-                    //Get all functions in the class
-                    TSClassDumpEngineMethod[] classMethods = PsiTreeUtil.getChildrenOfType(classDecl, TSClassDumpEngineMethod.class);
-                    if (classMethods != null) {
-                        Collections.addAll(methods, classMethods);
-                    }
-
-                    TSClassDumpGroup[] groups = PsiTreeUtil.getChildrenOfType(classDecl, TSClassDumpGroup.class);
-                    addEngineMethodsFromGroups(methods, groups);
-                }
-            }
-        }
-        TSClassDumpFile functionDump = exporter.getGlobalFunctions();
-        if (functionDump != null) {
-            //Read global functions from the global dump
-            TSClassDumpNamespaceDecl[] namespaces = PsiTreeUtil.getChildrenOfType(functionDump, TSClassDumpNamespaceDecl.class);
-            if (namespaces != null) {
-                for (TSClassDumpNamespaceDecl namespaceDecl : namespaces) {
-                    //Get all functions in the class
-                    TSClassDumpEngineMethod[] nsMethods = PsiTreeUtil.getChildrenOfType(namespaceDecl, TSClassDumpEngineMethod.class);
-                    if (nsMethods != null) {
-                        Collections.addAll(methods, nsMethods);
-                    }
-
-                    TSClassDumpGroup[] groups = PsiTreeUtil.getChildrenOfType(namespaceDecl, TSClassDumpGroup.class);
-                    addEngineMethodsFromGroups(methods, groups);
-                }
-            }
-        }
-
-        synchronized (engineMethodLock) {
-            engineMethods = methods;
-        }
+    public void buildScriptClassList(TSSymbolExporter exporter) {
+        scriptClassList.buildClassList(exporter);
     }
 
-    private void addEngineMethodsFromGroups(HashSet<TSClassDumpEngineMethod> methods, TSClassDumpGroup[] groups) {
-        if (groups != null) {
-            for (TSClassDumpGroup group : groups) {
-                //Get all functions in the group
-                TSClassDumpEngineMethod[] groupMethods = PsiTreeUtil.getChildrenOfType(group, TSClassDumpEngineMethod.class);
-                if (groupMethods != null) {
-                    Collections.addAll(methods, groupMethods);
-                }
-            }
-        }
+    /**
+     * Build the engine method list from a symbol export list
+     */
+    public void buildEngineMethodList(TSSymbolExporter exporter) {
+        engineMethodList.buildEngineMethodList(exporter);
     }
 }

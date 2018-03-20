@@ -27,7 +27,7 @@ class_dump ::= (class_decl | stub_class_decl)+
 
 class_decl ::= block_comment? class_header class_inner* class_footer
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"
-     methods=[getName setName getNameIdentifier getPresentation]}
+     methods=[getName setName getNameIdentifier getPresentation getParentName]}
 stub_class_decl ::= DOC_COMMENT class_header class_inner* class_footer
 namespace_decl ::= namespace_header namespace_inner*
     {mixin="com.torquescript.psi.impl.TSNamedElementImpl" implements="com.torquescript.psi.TSNamedElement, com.intellij.navigation.NavigationItem"

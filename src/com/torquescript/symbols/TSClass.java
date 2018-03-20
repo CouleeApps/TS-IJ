@@ -1,17 +1,20 @@
-package com.torquescript.model;
+package com.torquescript.symbols;
+
+import com.intellij.psi.PsiElement;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class TSClass {
     private String name;
     private TSClass parentClass;
     private List<TSClass> childClasses;
+    private PsiElement element;
 
-    public TSClass(String name) {
+    public TSClass(String name, PsiElement element) {
         this.name = name;
+        this.element = element;
         this.parentClass = null;
         this.childClasses = new ArrayList<>();
     }
@@ -66,5 +69,9 @@ public class TSClass {
         }
 
         return allClasses;
+    }
+
+    public PsiElement getElement() {
+        return element;
     }
 }

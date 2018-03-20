@@ -7,6 +7,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.torquescript.TSFunctionType;
 import com.torquescript.highlighting.TSSyntaxHighlighter;
 import com.torquescript.psi.*;
+import com.torquescript.reference.TSClassNameReference;
 import com.torquescript.reference.TSFunctionCallReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,40 +18,28 @@ import org.jetbrains.annotations.NotNull;
 public class TSClassNameAnnotator extends TSAnnotator {
     @Override
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-        PsiElement classElement = null;
-        if (element instanceof  TSDatablockDecl) {
-            TSDatablockDecl db = (TSDatablockDecl) element;
-
-            //Find the first id node, this is kinda wonky since we have to account for whitespace nodes
-            //datablock ClassName(...)
-            ASTNode node = db.getNode();
-            if (node == null) {
-                return;
-            }
-            node = node.findChildByType(TSTypes.ID);
-            if (node == null) {
-                return;
-            }
-            classElement = node.getPsi();
-        } else if (element instanceof TSObjectExpr) {
-            TSObjectExpr obj = (TSObjectExpr) element;
-
-            //Class name should be the second thing in the element:
-            // new ClassName(...)
-            classElement = PsiTreeUtil.getChildOfType(obj, TSClassNameExpr.class);
-
-            if (classElement == null) {
-                return;
-            }
-            classElement = classElement.getFirstChild();
+        TSClassExpr classElement = null;
+        TSClassExpr[] names = PsiTreeUtil.getChildrenOfType(element, TSClassExpr.class);
+        if (names != null && names.length > 0) {
+            classElement = names[0];
         }
         if (classElement == null) {
             return;
         }
 
-        //Only annotate if it's an id, can't really tell if it's an expr
-        if (classElement.getNode().getElementType().equals(TSTypes.ID)) {
+        //Check if the class name actually resolves to a real class. TSClassNameReference will check this
+        // for us, we just have to see if it gives any results.
+        boolean valid = false;
+        TSClassNameReference ref = (TSClassNameReference)classElement.getReference();
+        if (ref != null) {
+            //If there are any results at all then this is successful
+            valid = ref.multiResolve(false).length > 0;
+        }
+
+        if (valid) {
             createSuccessAnnotation(classElement, holder, TSSyntaxHighlighter.CLASSNAME);
+        } else {
+            createWarnAnnotation(classElement, holder, "Can't find class name");
         }
     }
 }

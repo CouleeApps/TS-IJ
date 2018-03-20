@@ -126,7 +126,7 @@ foreach_stmt ::=
     {pin('.*')=1}
 
 datablock_decl ::=
-    DATABLOCK ID PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
+    DATABLOCK class_expr PAREN_OPEN ID (COLON ID)? PAREN_CLOSE BRACE_OPEN field_list BRACE_CLOSE SEMICOLON
     {extends=object_expr
     methods=[getName getClassName getParentName]
     pin('.*')=1}
@@ -230,7 +230,7 @@ private object_fields_expr ::=
 class_name_expr ::=
     PAREN_OPEN expr PAREN_CLOSE
     |
-    ID
+    class_expr
 
 //-----------------------------------------------------------------------------
 // The relatively decent and normal expression section
@@ -320,6 +320,7 @@ paren_expr ::= PAREN_OPEN expr PAREN_CLOSE
 //-----------------------------------------------------------------------------
 //Helpers
 
+class_expr ::= ID {methods=[getName getReference]}
 private indirection ::= DOT | POINT_INTERNAL | POINT_INTERNAL_RECURSIVE
 private array_index_expr ::= expr (COMMA expr)*
 

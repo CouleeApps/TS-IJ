@@ -98,6 +98,25 @@ public class TSUtil {
         return getSymbolList(project).findObject(key);
     }
 
+    /**
+     * Find all function in the project.
+     * @param project Containing project in which to search
+     * @return A list of functions
+     */
+    public static Collection<TSClass> getScriptClassList(Project project) {
+        return getSymbolList(project).getScriptClassList();
+    }
+
+    /**
+     * Find a function in the project matching a given string.
+     * @param project Containing project in which to search
+     * @param key Search string compare functions with
+     * @return A function declaration, or null if none is found
+     */
+    public static List<TSClass> findScriptClass(Project project, String key) {
+        return getSymbolList(project).findScriptClass(key);
+    }
+
     public static String getElementNamespace(PsiElement element) {
         if (element.getNode().getElementType().equals(TSTypes.ID)) {
             return element.getText();
